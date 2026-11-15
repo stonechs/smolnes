@@ -1,0 +1,8 @@
+exe=D:\2026work\smolnes\dist\V3\upx-test\smolnes-v3-upx.exe
+rom=D:\2026work\smolnes\roms\commercial\pig.NES
+window_title=smolnes
+window_handle=12594528
+center_pixel=0x8C0000
+client_nonblack_samples=13440/13440
+exit_code=0
+result=PASS

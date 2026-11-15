@@ -1,0 +1,5 @@
+exe=D:\2026work\smolnes\dist\V3\upx-test\smolnes-v3-upx.exe
+rom=D:\2026work\smolnes\roms\commercial\missing-smoke-rom.nes
+error_dialog=detected_and_dismissed
+missing_rom_exit=1
+result=PASS
