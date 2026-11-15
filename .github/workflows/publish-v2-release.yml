@@ -1,0 +1,31 @@
+name: Publish smolnes V2
+
+on:
+  push:
+    branches:
+      - v2-windows-native
+
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    if: ${{ github.event.head_commit.message == 'Publish smolnes V2 release' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create the V2 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v2 >/dev/null 2>&1; then
+            echo "Release v2 already exists; nothing to publish."
+            exit 0
+          fi
+          gh release create v2 \
+            windows/V2/smolnes-v2.exe \
+            windows/V2/smolnes-v2-source.zip \
+            windows/V2/release-assets-sha256.txt \
+            --title "smolnes Windows-native V2" \
+            --notes-file windows/V2/RELEASE_NOTES.md
