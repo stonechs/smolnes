@@ -1,0 +1,11 @@
+Architecture: x86
+Compiler: i686-w64-mingw32-gcc.exe (MinGW-W64 i686-ucrt-posix-dwarf, built by Brecht Sanders, r3) 16.2.0
+Target: i686-w64-mingw32
+Source: D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\source\deobfuscated_win32.c
+Flags: -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS
+Link flags: -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS -static -mwindows -Wl,--gc-sections -s -Wl,--no-insert-timestamp -nostartfiles -Wl,-e,_mainCRTStartup -nostdlib -Wl,-T,D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\linker-merge-one-section-x86.ld -Wl,--disable-dynamicbase -Wl,--disable-reloc-section D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\objects\deobfuscated_win32-x86.o -o D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\smolnes-v1.3-native-caption-x86.exe -Wl,-Map=D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\link-x86.map -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc
+Layout: one RWX .idata file-backed section plus zero-fill .bss
+Post-link patch: .idata characteristics set to code/read/write/execute
+Object bytes: 64483
+EXE bytes: 9728
+SHA256: 1FEEFDCCA6339DED3AD7673A73A9BEED5CA0353935D833CE8BB4F512E7105019
