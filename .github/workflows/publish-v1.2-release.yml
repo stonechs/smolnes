@@ -3,7 +3,7 @@ name: Publish smolnes V1.2
 on:
   push:
     branches:
-      - v1.2-windows-native
+      - v1.x-windows-native
 
 permissions:
   contents: write

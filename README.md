@@ -68,7 +68,7 @@ Keys:
 
 ## Updating keys
 
-Look for line 20 in the source code. The following table shows which
+Look at `src/org/smolnes.c` around line 20. The following table shows which
 numbers map to which keyboard keys:
 
 | character | number | default key | NES button |
@@ -101,3 +101,7 @@ numbers map to which keyboard keys:
   
 
 Let me know if you've used smolnes and I'll add it to the list.
+
+## V1.x source layout
+
+The original upstream SDL sources are in `src/org/`. The latest V1.x source (V1.3) is `src/deobfuscated_win32.c`; its release build inputs remain under `release/V1.3/`. The frozen V1 source and build snapshot are under `archive/V1-release/`.

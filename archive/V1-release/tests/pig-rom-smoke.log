@@ -1,0 +1,7 @@
+exe=D:\2026work\smolnes\dist\V1\smolnes-v1.exe
+rom=D:\2026work\smolnes\roms\commercial\pig.NES
+window_title=smolnes
+window_handle=6620644
+center_pixel=0x8C0000
+exit_code=0
+result=PASS
