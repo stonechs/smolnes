@@ -67,7 +67,7 @@
 - 2026-11-15：阶段 2 完成。添加背景像素/调色板采样行缓存，数据仍在现有 dot 时点采集。`pig.NES` 中心像素 `0x8C0000`、sprite-limit fixture `0x636163` 均通过。相邻复测阶段 1 为 3.764 / 1.217 ms，阶段 2 为 3.705 / 1.219 ms，视为持平。阶段快照位于 `archive/V1.2-scanline/stage-02-background-buffer/`。
 - 2026-11-15：阶段 3 完成。每行预解码前 8 个精灵图案像素并按 OAM 顺序选出每个屏幕位置的首个不透明像素，逐 dot 合成背景、精灵和 Sprite 0 hit。`pig.NES` 中心像素 `0x8C0000`，sprite-limit `0x636163`，sprite-row-cache `0xFF9A63` 均通过。
 - 阶段 3 最近一组相邻性能数据：阶段 2 3.366 ms 模拟工作 / 1.156 ms GDI；阶段 3 3.344 / 1.265 ms，模拟时间持平，GDI 变化在运行波动范围内。曾测试在 dot 256 延迟写整行 framebuffer，首轮模拟时间约慢 15%；该做法已撤回，最终保留逐 dot 输出和精灵行预解码。
-- 最终候选：`dist/V1.2/smolnes-v1.2.exe`，29,184 字节；最终标准输出版的 `pig.NES` 窗口/画面/关闭冒烟通过。V1.1 文件与归档保持未改动。
+- 最终候选：`dist/V1.2/github-package/smolnes-v1.2.exe`，29,184 字节；最终标准输出版的 `pig.NES` 窗口/画面/关闭冒烟通过。V1.1 文件与归档保持未改动。
 - 阶段 3 快照：`archive/V1.2-scanline/stage-03-scanline-compose/`。
 
 

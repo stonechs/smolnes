@@ -3,7 +3,7 @@ name: Publish smolnes V3
 on:
   push:
     branches:
-      - v3-windows-native
+      - main
 
 permissions:
   contents: write
@@ -24,10 +24,10 @@ jobs:
             exit 0
           fi
           gh release create v3 \
-            windows/V3/smolnes-v3.exe \
-            windows/V3/smolnes-v3-source.zip \
-            windows/V3/release-assets-sha256.txt \
+            dist/V3/final/smolnes-v3.exe \
+            dist/V3/final/smolnes-v3-source.zip \
+            dist/V3/final/release-assets-sha256.txt \
             --target "$GITHUB_SHA" \
             --title "smolnes Windows-native V3" \
-            --notes-file windows/V3/RELEASE_NOTES.md
+            --notes-file dist/V3/final/RELEASE_NOTES.md
 

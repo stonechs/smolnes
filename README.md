@@ -101,3 +101,7 @@ numbers map to which keyboard keys:
   
 
 Let me know if you've used smolnes and I'll add it to the list.
+
+## Windows documentation and releases
+
+General documentation is in [docs/](docs/README.md). Versioned release packages are under [dist/](dist/): V1, V1.2, V2, and V3. The V1 guide is in [docs/releases/README-V1.md](docs/releases/README-V1.md); the V1.2 scanline migration notes are in [docs/plans/PPU_SCANLINE_MIGRATION.md](docs/plans/PPU_SCANLINE_MIGRATION.md).

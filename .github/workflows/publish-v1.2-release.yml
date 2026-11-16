@@ -3,7 +3,7 @@ name: Publish smolnes V1.2
 on:
   push:
     branches:
-      - v1.2-windows-native
+      - v1.x-windows-native
 
 permissions:
   contents: write
@@ -24,8 +24,8 @@ jobs:
             exit 0
           fi
           gh release create v1.2 \
-            windows/V1.2/smolnes-v1.2.exe \
-            windows/V1.2/smolnes-v1.2-source.zip \
-            windows/V1.2/release-assets-sha256.txt \
+            dist/V1.2/github-package/smolnes-v1.2.exe \
+            dist/V1.2/github-package/smolnes-v1.2-source.zip \
+            dist/V1.2/github-package/release-assets-sha256.txt \
             --title "smolnes Windows-native V1.2" \
-            --notes-file windows/V1.2/RELEASE_NOTES.md
+            --notes-file dist/V1.2/github-package/RELEASE_NOTES.md

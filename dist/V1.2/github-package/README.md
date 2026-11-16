@@ -31,4 +31,4 @@ The script writes `dist\V1.2\smolnes-v1.2.exe`. The build uses `-Os`, function/d
 
 ## Verification
 
-`pig.NES` opened, displayed the expected center pixel (`0x8C0000`), and closed normally. The sprite-limit fixture produced `0x636163`; the sprite-row fixture produced `0xFF9A63`. Performance CSVs and the migration plan are included in this package. These checks do not establish broad ROM compatibility.
+`pig.NES` opened, displayed the expected center pixel (`0x8C0000`), and closed normally. The sprite-limit fixture produced `0x636163`; the sprite-row fixture produced `0xFF9A63`. Performance CSVs are included in this package. The [scanline migration plan](../../../docs/plans/PPU_SCANLINE_MIGRATION.md) is maintained under the repository documentation. These checks do not establish broad ROM compatibility.

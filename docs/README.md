@@ -1,0 +1,12 @@
+# Project documentation
+
+- `plans/` contains development and migration plans.
+- `releases/` contains version guides that apply to the repository as a whole.
+
+Version-specific release notes, build inputs, and artifacts stay together under
+`../dist/`:
+
+- `../dist/V1/`
+- `../dist/V1.2/github-package/`
+- `../dist/V2/`
+- `../dist/V3/final/`
