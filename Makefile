@@ -15,10 +15,10 @@ WARN=-std=c99 \
 		 -Wno-switch
 SDLFLAGS=$(shell pkg-config --cflags --libs sdl2)
 
-smolnes: smolnes.c
+smolnes: src/org/smolnes.c
 	$(CC) -O2 -o $@ $< ${SDLFLAGS} -g ${WARN}
 
-deobfuscated: deobfuscated.c
+deobfuscated: src/org/deobfuscated.c
 	$(CC) -O2 -o $@ $< ${SDLFLAGS} -g ${WARN}
 
 clean:

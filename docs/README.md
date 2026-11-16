@@ -12,3 +12,6 @@ Version-specific release notes, build inputs, and artifacts stay together under
 - `../dist/V3/final/`
 
 The V1 historical source, build script, and checksum snapshot are kept in `../archive/V1-release/`.
+
+
+Source layout: original upstream `.c` files are under `../src/org/`; the current V3 Windows sources and headers are under `../src/`.
