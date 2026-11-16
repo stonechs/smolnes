@@ -1,0 +1,11 @@
+Architecture: x64
+Compiler: gcc.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r3) 16.2.0
+Target: x86_64-w64-mingw32
+Source: D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\source\deobfuscated_win32.c
+Flags: -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS
+Link flags: -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS -static -mwindows -Wl,--gc-sections -s -Wl,--no-insert-timestamp -nostartfiles -Wl,-e,mainCRTStartup -nostdlib -Wl,-T,D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\linker-merge-one-section-x64.ld D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\objects\deobfuscated_win32-x64.o -o D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\smolnes-v1.3-native-caption-x64.exe -Wl,-Map=D:\2026work\smolnes\dist\V1.3\size-experiments\api-pruning\step-11-native-caption-property-only-both\link-x64.map -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc
+Layout: one RWX .idata file-backed section plus zero-fill .bss
+Post-link patch: .idata characteristics set to code/read/write/execute
+Object bytes: 63744
+EXE bytes: 10240
+SHA256: EF0A266034EBCAA63615A4746F34BED7ED814B477D780939BC485EF6B3C2D9EE
