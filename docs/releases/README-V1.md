@@ -1,16 +1,10 @@
 # smolnes Windows-native V1
 
-This V1 keeps the readable emulator core from `deobfuscated.c` and replaces SDL with Win32 keyboard/window handling and GDI rendering. It uses the original BGR565 framebuffer layout and needs no `SDL2.dll`.
+V1 keeps the readable emulator core and replaces SDL with Win32 keyboard/window handling and GDI rendering. It uses the original BGR565 framebuffer layout and needs no `SDL2.dll`.
 
-## Build
+## Build snapshot
 
-Use a 64-bit MinGW-w64 GCC toolchain on Windows. From PowerShell in this repository:
-
-```powershell
-.\build-v1.ps1 -GccPath "C:\path\to\mingw64\bin\gcc.exe"
-```
-
-The default output is `dist\V1\smolnes-v1.exe`. If `gcc.exe` is on `PATH`, `-GccPath` can be omitted.
+V1 is a frozen release. Its original source, build script, CMake file, checksum manifest, binary snapshot, and smoke record are grouped under [`archive/V1-release/`](../../archive/V1-release/). The archived build script is retained as release history; the published executable is available under `dist/V1/`.
 
 ## Run
 

@@ -10,3 +10,5 @@ Version-specific release notes, build inputs, and artifacts stay together under
 - `../dist/V1.2/github-package/`
 - `../dist/V2/`
 - `../dist/V3/final/`
+
+The V1 historical source, build script, and checksum snapshot are kept in `../archive/V1-release/`.
