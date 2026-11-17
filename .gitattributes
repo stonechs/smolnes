@@ -1,0 +1,2 @@
+/dist/V1.4/candidate/checked/*.map -text -diff
+/dist/V1.4/candidate/extreme/*.map -text -diff

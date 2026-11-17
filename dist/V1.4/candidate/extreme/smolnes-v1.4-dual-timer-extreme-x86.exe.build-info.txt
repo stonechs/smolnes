@@ -1,0 +1,15 @@
+Version: V1.4 dual-timer candidate
+Variant: extreme
+Architecture: x86
+Compiler: i686-w64-mingw32-gcc.exe (MinGW-W64 i686-ucrt-posix-dwarf, built by Brecht Sanders, r3) 16.2.0
+Target: i686-w64-mingw32
+Source: source/deobfuscated_win32.c
+Source SHA256: 60094F9599C1E12D30F2700A2E04BBB7233B3512DAADEC105B94995EA6CE3604
+Compile flags: -DSMOLNES_OMIT_TIMER_FAILURE_CHECKS -DSMOLNES_OMIT_TIMER_SHUTDOWN_CLEANUP -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS
+Linker script: linker-merge-one-section-x86.ld
+Entry point: _mainCRTStartup
+Link flags: -static -mwindows -Wl,--gc-sections -s -Wl,--no-insert-timestamp -nostartfiles -Wl,-e,_mainCRTStartup -nostdlib -Wl,-T,linker-merge-one-section-x86.ld -Wl,--disable-dynamicbase -Wl,--disable-reloc-section -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc
+PE layout: single RWX .idata file-backed section plus zero-fill .bss
+Object bytes: 61485
+EXE bytes: 9216
+SHA256: F93345A7C36808F72FDAFBF1DE320CFECEA37755627BDD8B6C86055DC549F9A7
