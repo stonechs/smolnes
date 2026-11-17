@@ -8,4 +8,4 @@
 
 Original upstream SDL C sources are in `../src/org/`. The current V1.x source is V1.3, stored at `../src/deobfuscated_win32.c`.
 
-- `releases/README-V1.4.md` summarizes the local V1.4 dual-timer candidate.
+- `releases/README-V1.4.md` summarizes the V1.4 release candidate (extreme timer-size build only).

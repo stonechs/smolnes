@@ -1,15 +1,16 @@
-Version: V1.4 dual-timer candidate
-Variant: extreme
+Version: V1.4 dual-timer release build
+Variant: extreme timer-size implementation
 Architecture: x64
 Compiler: gcc.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r3) 16.2.0
 Target: x86_64-w64-mingw32
 Source: source/deobfuscated_win32.c
 Source SHA256: 60094F9599C1E12D30F2700A2E04BBB7233B3512DAADEC105B94995EA6CE3604
 Compile flags: -DSMOLNES_OMIT_TIMER_FAILURE_CHECKS -DSMOLNES_OMIT_TIMER_SHUTDOWN_CLEANUP -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS
-Linker script: linker-merge-one-section-x64.ld
+Linker script: build-support/linker/linker-merge-one-section-x64.ld
 Entry point: mainCRTStartup
-Link flags: -static -mwindows -Wl,--gc-sections -s -Wl,--no-insert-timestamp -nostartfiles -Wl,-e,mainCRTStartup -nostdlib -Wl,-T,linker-merge-one-section-x64.ld -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc
+Link flags: -static -mwindows -Wl,--gc-sections -s -Wl,--no-insert-timestamp -nostartfiles -Wl,-e,mainCRTStartup -nostdlib -Wl,-T,build-support/linker/linker-merge-one-section-x64.ld -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc
 PE layout: single RWX .idata file-backed section plus zero-fill .bss
+Timer creation/start failures are unchecked; timer shutdown cleanup is omitted
 Object bytes: 61378
 EXE bytes: 9728
 SHA256: 1285BBE5D6ED12DCE76DAB439D36483911AFB2FA7AA4B1965416721623A2AE18

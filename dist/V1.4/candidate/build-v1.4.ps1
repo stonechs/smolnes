@@ -6,31 +6,31 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $source = Join-Path $root 'source\deobfuscated_win32.c'
-$output = Join-Path $root 'checked'
-$objects = Join-Path $output 'objects'
-New-Item -ItemType Directory -Force -Path $objects | Out-Null
+$release = Join-Path $root 'release'
+$objects = Join-Path $root 'build-support\objects'
+$maps = Join-Path $root 'build-support\maps'
+New-Item -ItemType Directory -Force -Path $release, $objects, $maps | Out-Null
 
 function Resolve-Gcc([string]$Path) {
     if (Test-Path -LiteralPath $Path -PathType Leaf) {
         return (Resolve-Path -LiteralPath $Path).Path
     }
-    $command = Get-Command $Path -ErrorAction Stop
-    return $command.Source
+    return (Get-Command $Path -ErrorAction Stop).Source
 }
 
 $targets = @(
     @{ Arch = 'x64'; Gcc = $GccPathX64; Entry = 'mainCRTStartup' },
     @{ Arch = 'x86'; Gcc = $GccPathX86; Entry = '_mainCRTStartup' }
 )
-$common = @('-Oz', '-flto', '-DNDEBUG', '-ffunction-sections', '-fno-unwind-tables', '-fno-asynchronous-unwind-tables', '-DSMOLNES_NO_ERROR_CHECKS')
+$common = @('-DSMOLNES_OMIT_TIMER_FAILURE_CHECKS', '-DSMOLNES_OMIT_TIMER_SHUTDOWN_CLEANUP', '-Oz', '-flto', '-DNDEBUG', '-ffunction-sections', '-fno-unwind-tables', '-fno-asynchronous-unwind-tables', '-DSMOLNES_NO_ERROR_CHECKS')
 
 foreach ($target in $targets) {
     $arch = $target.Arch
     $gcc = Resolve-Gcc $target.Gcc
     $object = Join-Path $objects "deobfuscated_win32-$arch.o"
-    $exe = Join-Path $output "smolnes-v1.4-dual-timer-$arch.exe"
-    $map = Join-Path $output "link-$arch.map"
-    $linker = Join-Path $root "linker-merge-one-section-$arch.ld"
+    $exe = Join-Path $release "smolnes-v1.4-dual-timer-$arch.exe"
+    $map = Join-Path $maps "link-$arch.map"
+    $linker = Join-Path $root "build-support\linker\linker-merge-one-section-$arch.ld"
     $entry = $target.Entry
 
     & $gcc @common '-c' $source '-o' $object
@@ -65,19 +65,20 @@ foreach ($target in $targets) {
     [IO.File]::WriteAllBytes($exe, $bytes)
 
     $hash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash
-    $compiler = (& $gcc --version | Select-Object -First 1)
-    $targetName = (& $gcc -dumpmachine | Select-Object -First 1)
     $metadata = @(
-        'Version: V1.4 dual-timer candidate (checked build)',
+        'Version: V1.4 dual-timer release build',
+        'Variant: extreme timer-size implementation',
         "Architecture: $arch",
-        "Compiler: $compiler",
-        "Target: $targetName",
+        "Compiler: $(& $gcc --version | Select-Object -First 1)",
+        "Target: $(& $gcc -dumpmachine | Select-Object -First 1)",
         'Source: source/deobfuscated_win32.c',
+        "Source SHA256: $((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash)",
         "Compile flags: $($common -join ' ')",
-        "Linker script: linker-merge-one-section-$arch.ld",
+        "Linker script: build-support/linker/linker-merge-one-section-$arch.ld",
         "Entry point: $entry",
         'Link flags: -static -mwindows --gc-sections -s --no-insert-timestamp -nostartfiles -nostdlib -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc',
         'PE layout: single RWX .idata file-backed section plus zero-fill .bss',
+        'Timer creation/start failures are unchecked; timer shutdown cleanup is omitted',
         "Object bytes: $((Get-Item -LiteralPath $object).Length)",
         "EXE bytes: $((Get-Item -LiteralPath $exe).Length)",
         "SHA256: $hash"

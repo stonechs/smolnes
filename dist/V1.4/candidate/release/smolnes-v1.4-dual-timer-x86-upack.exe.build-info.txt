@@ -1,0 +1,7 @@
+Version: V1.4 dual-timer release
+Packer: UPack 0.39
+Packer arguments: in-place on a copy of the x86 release executable
+Input: smolnes-v1.4-dual-timer-x86.exe
+Input SHA256: F93345A7C36808F72FDAFBF1DE320CFECEA37755627BDD8B6C86055DC549F9A7
+Output bytes: 6012
+Output SHA256: 99E445BEF6C71D2158C2D6DAE26A0D17E251463ECFB01B99A05F4EB3B35347B8

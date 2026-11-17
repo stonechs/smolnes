@@ -107,4 +107,4 @@ Let me know if you've used smolnes and I'll add it to the list.
 The original upstream SDL sources are in `src/org/`. The latest V1.x source (V1.3) is `src/deobfuscated_win32.c`; its release build inputs remain under `release/V1.3/`. The frozen V1 source and build snapshot are under `archive/V1-release/`.
 ## V1.4 candidate
 
-The V1.4 dual-timer candidate for the V1.x line is under `dist/V1.4/candidate/`. See [its review notes](docs/releases/README-V1.4.md). Runtime pacing and game compatibility have not yet been validated.
+The V1.4 dual-timer release candidate for the V1.x line is under `dist/V1.4/candidate/`. Only the extreme timer-size build is included; see [its release notes](docs/releases/README-V1.4.md). Runtime pacing and game compatibility have not yet been validated.
