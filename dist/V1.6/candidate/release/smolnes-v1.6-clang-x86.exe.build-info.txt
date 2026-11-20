@@ -1,0 +1,11 @@
+Version: V1.6 candidate
+File: smolnes-v1.6-clang-x86.exe
+Size: 9216 B
+SHA256: 85C9DEE21E361BFD080B1123E74B67A9AAD99E08029A44F9769FA5CA5470B863
+Architecture: x86
+Compiler: Clang/LLVM 23.1.5
+Target: i686-pc-windows-msvc
+Compile: -Oz -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -ffunction-sections -fdata-sections
+Linker: LLD /OPT:REF /OPT:ICF /FIXED; merged compact sections
+LTO: no
+Source SHA256: 975A9774CFCDD35FDFF204882E5C0B4089339320D809EC64AE7D7B94DFD008CB

@@ -1,0 +1,129 @@
+ smolnes-v1.6-clang-x64
+
+ Timestamp is 6b0075a2 (Fri Nov 20 11:30:26 2026)
+
+ Preferred load address is 0000000140000000
+
+ Start         Length     Name                   Class
+ 0001:00000000 00001bebH .text                   CODE
+ 0002:00000000 00000278H .rdata                  DATA
+ 0003:00000000 00000004H .data                   DATA
+ 0003:00000004 00124be8H .bss                    DATA
+
+  Address         Publics by Value              Rva+Base               Lib:Object
+
+ 0001:0000074e       mainCRTStartup             000000014000174e     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:00000408       __imp_CloseHandle          0000000140003408     kernel32:KERNEL32.dll
+ 0002:00000410       __imp_CreateFileA          0000000140003410     kernel32:KERNEL32.dll
+ 0002:00000418       __imp_CreateWaitableTimerA 0000000140003418     kernel32:KERNEL32.dll
+ 0002:00000420       __imp_ExitProcess          0000000140003420     kernel32:KERNEL32.dll
+ 0002:00000428       __imp_GetModuleHandleA     0000000140003428     kernel32:KERNEL32.dll
+ 0002:00000430       __imp_ReadFile             0000000140003430     kernel32:KERNEL32.dll
+ 0002:00000438       __imp_SetWaitableTimer     0000000140003438     kernel32:KERNEL32.dll
+ 0002:00000448       __imp_BeginPaint           0000000140003448     user32:USER32.dll
+ 0002:00000450       __imp_CreateWindowExA      0000000140003450     user32:USER32.dll
+ 0002:00000458       __imp_DefWindowProcA       0000000140003458     user32:USER32.dll
+ 0002:00000460       __imp_DestroyWindow        0000000140003460     user32:USER32.dll
+ 0002:00000468       __imp_DispatchMessageA     0000000140003468     user32:USER32.dll
+ 0002:00000470       __imp_EndPaint             0000000140003470     user32:USER32.dll
+ 0002:00000478       __imp_GetAsyncKeyState     0000000140003478     user32:USER32.dll
+ 0002:00000480       __imp_InvalidateRect       0000000140003480     user32:USER32.dll
+ 0002:00000488       __imp_MsgWaitForMultipleObjects 0000000140003488     user32:USER32.dll
+ 0002:00000490       __imp_PeekMessageA         0000000140003490     user32:USER32.dll
+ 0002:00000498       __imp_RegisterClassExA     0000000140003498     user32:USER32.dll
+ 0002:000004a0       __imp_ShowWindow           00000001400034a0     user32:USER32.dll
+ 0002:000004a8       __imp_TranslateMessage     00000001400034a8     user32:USER32.dll
+ 0002:000004b0       __imp_UpdateWindow         00000001400034b0     user32:USER32.dll
+ 0002:000004c0       __imp_StretchDIBits        00000001400034c0     gdi32:GDI32.dll
+ 0002:000004d0       __imp_GetOpenFileNameA     00000001400034d0     comdlg32:COMDLG32.dll
+
+ entry point at         0001:0000074e
+
+ Static symbols
+
+ 0001:00000000       get_chr_byte               0000000140001000     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:0000003a       get_nametable_byte         000000014000103a     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:0000008e       mem                        000000014000108e     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:000006fb       read_pc                    00000001400016fb     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:0000072f       set_nz                     000000014000172f     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:000007aa       run_emulator               00000001400017aa     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:00001a69       window_proc                0000000140002a69     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0001:00001b8e       pump_native_messages       0000000140002b8e     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:00000000       mask                       0000000140003000     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:00000020       nes_palette_rgb565         0000000140003020     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:000000a0       frame_bitmap_info          00000001400030a0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:00000278       ??_C@_00CNPNBAHC@?$AA@     0000000140003278     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:00000280       ??_C@_0BG@MNMHCJLB@smolnes?9native?9window?$AA@ 0000000140003280     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0002:00000298       ??_C@_0CN@LIMGGHO@NES?5ROMs?5?$CI?$CK?4nes?$CJ?$AA?$CK?4nes?$AAAll?5files@ 0000000140003298     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000000       prgbits                    0000000140004000     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000001       chrbits                    0000000140004001     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000002       P                          0000000140004002     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000003       S                          0000000140004003     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000004       shift_at                   0000000140004004     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000008       chrrom                     0000000140004008     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000010       chr                        0000000140004010     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000020       vram                       0000000140004020     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000820       mirror                     0000000140004820     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00000830       ram                        0000000140004830     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00002830       ppubuf                     0000000140006830     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00002831       tmp                        0000000140006831     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00002834       V                          0000000140006834     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00002840       chrram                     0000000140006840     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004840       palette_ram                0000000140008840     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004880       ppuctrl                    0000000140008880     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004884       T                          0000000140008884     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004886       ppumask                    0000000140008886     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004887       W                          0000000140008887     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004888       fine_x                     0000000140008888     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004889       ppustatus                  0000000140008889     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004890       oam                        0000000140008890     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00004990       keys                       0000000140008990     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:000049a0       prgram                     00000001400089a0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:000069a0       rombuf                     000000014000a9a0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069a0       prg                        000000014010a9a0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069a8       mmc3_chrprg                000000014010a9a8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b0       mmc3_bits                  000000014010a9b0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b1       mmc3_latch                 000000014010a9b1     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b2       mmc3_irq                   000000014010a9b2     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b3       mmc1_bits                  000000014010a9b3     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b4       mmc1_data                  000000014010a9b4     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b5       mmc1_ctrl                  000000014010a9b5     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b6       chrbank0                   000000014010a9b6     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b7       chrbank1                   000000014010a9b7     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069b8       prgbank                    000000014010a9b8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069c0       rom                        000000014010a9c0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069c8       pc_hi                      000000014010a9c8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069c9       PCL                        000000014010a9c9     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069ca       val                        000000014010a9ca     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069cb       A                          000000014010a9cb     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069cc       X                          000000014010a9cc     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069cd       Y                          000000014010a9cd     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069ce       addr_lo                    000000014010a9ce     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069cf       addr_hi                    000000014010a9cf     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d0       nomem                      000000014010a9d0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d1       result                     000000014010a9d1     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d2       opcode                     000000014010a9d2     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d3       nmi_irq                    000000014010a9d3     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d4       ntb                        000000014010a9d4     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d5       ptb_lo                     000000014010a9d5     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069d8       scany                      000000014010a9d8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069dc       dot                        000000014010a9dc     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069e0       atb                        000000014010a9e0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069e4       shift_hi                   000000014010a9e4     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069e8       shift_lo                   000000014010a9e8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069ec       cycles                     000000014010a9ec     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001069f0       frame_buffer               000000014010a9f0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:001249f0       window_focused             00000001401289f0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124a00       rom_dialog                 0000000140128a00     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124aa0       rom_path                   0000000140128aa0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124ba4       scanline_sprite_count      0000000140128ba4     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124ba8       scanline_sprite_indices    0000000140128ba8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bb0       scanline_sprite_rows       0000000140128bb0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bb8       scanline_sprite_height     0000000140128bb8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bc0       main_window                0000000140128bc0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bc8       app_running                0000000140128bc8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bcc       client_width               0000000140128bcc     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bd0       client_height              0000000140128bd0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124bd8       frame_timer_16             0000000140128bd8     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124be0       frame_timer_50             0000000140128be0     smolnes-v1.6-clang-x64.exe.lto.obj
+ 0003:00124be8       frame_wait_count           0000000140128be8     smolnes-v1.6-clang-x64.exe.lto.obj
