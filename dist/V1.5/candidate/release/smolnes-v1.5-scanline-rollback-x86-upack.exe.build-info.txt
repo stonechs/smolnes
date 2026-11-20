@@ -1,0 +1,7 @@
+Version: V1.5 dual-timer release
+Packer: UPack 0.39
+Packer arguments: in-place on a copy of the x86 release executable
+Input: smolnes-v1.5-scanline-rollback-x86.exe
+Input SHA256: ED9DA59B97A5E797C89B12B0C864AE906B2513E745A8BEED91CE72C78EA8C7F9
+Output bytes: 5884
+Output SHA256: BB121C2FA6BBEE43A50D46849A27907C5225FC7218E985C18DD040AABEA74ED4

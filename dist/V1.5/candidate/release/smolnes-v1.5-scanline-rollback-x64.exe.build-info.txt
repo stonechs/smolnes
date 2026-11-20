@@ -1,0 +1,16 @@
+Version: V1.5 candidate build
+Variant: scanline pixel rollback and window-message pruning
+Architecture: x64
+Compiler: gcc.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r3) 16.2.0
+Target: x86_64-w64-mingw32
+Source: source/deobfuscated_win32.c
+Source SHA256: 975A9774CFCDD35FDFF204882E5C0B4089339320D809EC64AE7D7B94DFD008CB
+Compile flags: -DSMOLNES_OMIT_TIMER_FAILURE_CHECKS -DSMOLNES_OMIT_TIMER_SHUTDOWN_CLEANUP -Oz -flto -DNDEBUG -ffunction-sections -fno-unwind-tables -fno-asynchronous-unwind-tables -DSMOLNES_NO_ERROR_CHECKS
+Linker script: build-support/linker/linker-merge-one-section-x64.ld
+Entry point: mainCRTStartup
+Link flags: -static -mwindows --gc-sections -s --no-insert-timestamp -nostartfiles -nostdlib -luser32 -lgdi32 -lkernel32 -lcomdlg32 -lgcc
+PE layout: single RWX .idata file-backed section plus zero-fill .bss
+Timer creation/start failures are unchecked; timer shutdown cleanup is omitted; 64-to-8 sprite selection retained
+Object bytes: 59666
+EXE bytes: 9728
+SHA256: A1F3B80CD86D6A84D57FDFC09C64830ED3BBD1EB06D8342AF45D6C122288BB9B
