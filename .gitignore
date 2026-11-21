@@ -8,3 +8,4 @@ CMakeSettings.json
 
 # Historical snapshots are kept outside this branch
 /archive/
+/tools/
