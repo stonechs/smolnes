@@ -1,11 +1,10 @@
-# V1.x documentation and sources
+# V1.x documentation
 
 - `releases/README-V1.md` describes the frozen V1 release.
 - `release-workflow.md` records release and validation conventions.
-- V1.2 package files remain under `../windows/V1.2/`.
-- V1.3 build inputs and release notes remain under `../release/V1.3/`.
-- The frozen V1 source/build snapshot is under `../archive/V1-release/`.
+- The V1.2 package, source, scanline migration notes, and test records are under `../dist/V1.2/`.
+- V1.3 build inputs, source, linker maps, and release notes are under `../dist/V1.3/`.
+- V1.4–V1.6 packages are under `../dist/V1.4/` through `../dist/V1.6/`.
+- Original upstream SDL C sources are in `../src/org/`; the latest Windows-native V1.x source snapshot is in `../dist/V1.6/candidate/source/`.
 
-Original upstream SDL C sources are in `../src/org/`. The current V1.x source is V1.3, stored at `../src/deobfuscated_win32.c`.
-
-- `releases/README-V1.4.md` summarizes the V1.4 release candidate (extreme timer-size build only).
+The historical `archive/` directory has been removed from this branch. Older documents may mention snapshots that were stored there during development; those snapshot files are no longer included.

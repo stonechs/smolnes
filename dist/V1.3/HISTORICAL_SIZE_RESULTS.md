@@ -1,6 +1,6 @@
 # V1.3 size results
 
-Base source: `archive/V1.2-scanline/stage-03-scanline-compose/source/deobfuscated_win32.c` (SHA-256 `CC9C3F0D34FAA91F698C33424036146B3B2EE261D71D8CA6243E49A9E46AACF4`). Baseline release executable: 29,184 bytes. Compiler: WinLibs MinGW-w64 GCC 16.2.0 x86_64 UCRT.
+Base source: V1.2 scanline stage 03 source (SHA-256 `CC9C3F0D34FAA91F698C33424036146B3B2EE261D71D8CA6243E49A9E46AACF4`; historical snapshot no longer included in this branch). Baseline release executable: 29,184 bytes. Compiler: WinLibs MinGW-w64 GCC 16.2.0 x86_64 UCRT.
 
 | Stage | Change | EXE | `.o` | Change from previous |
 |---|---|---:|---:|---:|

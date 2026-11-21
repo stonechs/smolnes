@@ -4,7 +4,7 @@ V1 keeps the readable emulator core and replaces SDL with Win32 keyboard/window 
 
 ## Build snapshot
 
-V1 is a frozen release. Its original source, build script, CMake file, checksum manifest, binary snapshot, and smoke record are grouped under [`archive/V1-release/`](../../archive/V1-release/). The archived build script is retained as release history; the published executable is available under `dist/V1/`.
+V1 is a frozen release. Its published executable is available under `dist/V1/`. The separate source/build snapshot was removed from the V1.x branch; original upstream SDL sources remain under `src/org/`.
 
 ## Run
 

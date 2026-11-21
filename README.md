@@ -104,7 +104,7 @@ Let me know if you've used smolnes and I'll add it to the list.
 
 ## V1.x source layout
 
-The original upstream SDL sources are in `src/org/`. The latest Windows-native V1.x source is under `dist/V1.6/candidate/source/`; the frozen V1 source and build snapshot are under `archive/V1-release/`.
+The original upstream SDL sources are in `src/org/`. The latest Windows-native V1.x source is under `dist/V1.6/candidate/source/`. The frozen V1 executable remains under `dist/V1/`; its separate build snapshot is no longer included in this branch.
 ## V1.4 candidate
 
 The V1.4 dual-timer release candidate for the V1.x line is under `dist/V1.4/candidate/`. Only the extreme timer-size build is included; see [its release notes](docs/releases/README-V1.4.md). Runtime pacing and game compatibility have not yet been validated.
