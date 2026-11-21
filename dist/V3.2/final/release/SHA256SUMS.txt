@@ -1,0 +1,4 @@
+d41b3e8bccd53f1c2b3afebd65d5ebb380e6c44c39dfee7514e2b4bfa5f96370  smolnes-v3.2-clang-x64-upx.exe
+6a241fea14d4251f576473eaeaf3974a420e053141e5433ec736451a4de5465c  smolnes-v3.2-clang-x64.exe
+921d417c66361751ea008afd6a3eee2d18ec7b827c336c4eabf9a9c7debc916f  smolnes-v3.2-clang-x86-crinkler.exe
+20fd2b59f8cc50ccd495dec7a9f427b25e0d8ac85ba64bcbfcc82726dae1a6d2  smolnes-v3.2-clang-x86.exe
