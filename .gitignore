@@ -5,3 +5,6 @@ out
 build
 .vs
 CMakeSettings.json
+
+# Local historical snapshots; keep out of the repository
+/archive/
