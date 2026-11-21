@@ -1,0 +1,11 @@
+Version: V1.7 candidate
+File: smolnes-v1.7-clang-x64.exe
+Size: 11264 B
+SHA256: D4A318974F8ECF42C05E080743AFCCE40027389DCD0596B681135B2C4439F151
+Architecture: x64
+Compiler: Clang/LLVM 23.1.5
+Target: x86_64-pc-windows-msvc
+Compile: -Oz -flto -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -ffunction-sections -fdata-sections
+Linker: LLD /OPT:REF /OPT:ICF /FIXED
+LTO: yes
+Source SHA256: 182BE5ACDE90960A575C032BB3467E9F682A94756C07DE2F30F483CE014D647D

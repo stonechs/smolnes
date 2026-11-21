@@ -1,0 +1,142 @@
+ smolnes-v1.7-clang-x86
+
+ Timestamp is 6b022af7 (Sat Nov 21 18:36:23 2026)
+
+ Preferred load address is 0000000000400000
+
+ Start         Length     Name                   Class
+ 0001:00000000 00001a97H .text                   CODE
+ 0001:00001a98 00000018H .data                   CODE
+ 0001:00001dd0 000002e8H .rdata                  CODE
+ 0001:000020fc 00124b28H .bss                    CODE
+
+  Address         Publics by Value              Rva+Base               Lib:Object
+
+ 0001:00000000       _get_chr_byte              0000000000401000     smolnes-v1.7-clang-x86.obj
+ 0001:00000030       _get_nametable_byte        0000000000401030     smolnes-v1.7-clang-x86.obj
+ 0001:0000007f       _mem                       000000000040107f     smolnes-v1.7-clang-x86.obj
+ 0001:00000672       _read_pc                   0000000000401672     smolnes-v1.7-clang-x86.obj
+ 0001:000006a2       _set_nz                    00000000004016a2     smolnes-v1.7-clang-x86.obj
+ 0001:000006c5       _mainCRTStartup            00000000004016c5     smolnes-v1.7-clang-x86.obj
+ 0001:00001a98       _prgbits                   0000000000402a98     smolnes-v1.7-clang-x86.obj
+ 0001:00001a99       _chrbits                   0000000000402a99     smolnes-v1.7-clang-x86.obj
+ 0001:00001a9a       _P                         0000000000402a9a     smolnes-v1.7-clang-x86.obj
+ 0001:00001a9b       _S                         0000000000402a9b     smolnes-v1.7-clang-x86.obj
+ 0001:00001a9c       _mask                      0000000000402a9c     smolnes-v1.7-clang-x86.obj
+ 0001:00001b84       __imp__CloseHandle@4       0000000000402b84     kernel32:KERNEL32.dll
+ 0001:00001b88       __imp__CreateFileA@28      0000000000402b88     kernel32:KERNEL32.dll
+ 0001:00001b8c       __imp__CreateWaitableTimerA@12 0000000000402b8c     kernel32:KERNEL32.dll
+ 0001:00001b90       __imp__ExitProcess@4       0000000000402b90     kernel32:KERNEL32.dll
+ 0001:00001b94       __imp__GetCommandLineA@0   0000000000402b94     kernel32:KERNEL32.dll
+ 0001:00001b98       __imp__GetModuleHandleA@4  0000000000402b98     kernel32:KERNEL32.dll
+ 0001:00001b9c       __imp__ReadFile@20         0000000000402b9c     kernel32:KERNEL32.dll
+ 0001:00001ba0       __imp__SetWaitableTimer@24 0000000000402ba0     kernel32:KERNEL32.dll
+ 0001:00001ba8       __imp__BeginPaint@8        0000000000402ba8     user32:USER32.dll
+ 0001:00001bac       __imp__CreateWindowExA@48  0000000000402bac     user32:USER32.dll
+ 0001:00001bb0       __imp__DefWindowProcA@16   0000000000402bb0     user32:USER32.dll
+ 0001:00001bb4       __imp__DestroyWindow@4     0000000000402bb4     user32:USER32.dll
+ 0001:00001bb8       __imp__DispatchMessageA@4  0000000000402bb8     user32:USER32.dll
+ 0001:00001bbc       __imp__EndPaint@8          0000000000402bbc     user32:USER32.dll
+ 0001:00001bc0       __imp__GetAsyncKeyState@4  0000000000402bc0     user32:USER32.dll
+ 0001:00001bc4       __imp__InvalidateRect@12   0000000000402bc4     user32:USER32.dll
+ 0001:00001bc8       __imp__MsgWaitForMultipleObjects@20 0000000000402bc8     user32:USER32.dll
+ 0001:00001bcc       __imp__PeekMessageA@20     0000000000402bcc     user32:USER32.dll
+ 0001:00001bd0       __imp__RegisterClassExA@4  0000000000402bd0     user32:USER32.dll
+ 0001:00001bd4       __imp__ShowWindow@8        0000000000402bd4     user32:USER32.dll
+ 0001:00001bd8       __imp__TranslateMessage@4  0000000000402bd8     user32:USER32.dll
+ 0001:00001bdc       __imp__UpdateWindow@4      0000000000402bdc     user32:USER32.dll
+ 0001:00001be4       __imp__StretchDIBits@52    0000000000402be4     gdi32:GDI32.dll
+ 0001:00001bec       __imp__GetOpenFileNameA@4  0000000000402bec     comdlg32:COMDLG32.dll
+ 0001:00001dd0       __xmm@0000000000000000272528260d095a58 0000000000402dd0     smolnes-v1.7-clang-x86.obj
+ 0001:00001de0       __xmm@00000003000000000000000180000000 0000000000402de0     smolnes-v1.7-clang-x86.obj
+ 0001:00001df0       __xmm@00000001000000000000008000000000 0000000000402df0     smolnes-v1.7-clang-x86.obj
+ 0001:00001e00       __xmm@0000000000000000000000ff000000fc 0000000000402e00     smolnes-v1.7-clang-x86.obj
+ 0001:00001e10       __xmm@0000000000000000000000ff000000fd 0000000000402e10     smolnes-v1.7-clang-x86.obj
+ 0001:00001e20       __xmm@00000400000000640000006400c80000 0000000000402e20     smolnes-v1.7-clang-x86.obj
+ 0001:00001e30       __real@00000010            0000000000402e30     smolnes-v1.7-clang-x86.obj
+ 0001:00001e34       __real@00000032            0000000000402e34     smolnes-v1.7-clang-x86.obj
+ 0001:00001e40       __xmm@00000001000000000000000000000000 0000000000402e40     smolnes-v1.7-clang-x86.obj
+ 0001:00001e50       __xmm@000000e0000001000000000000000000 0000000000402e50     smolnes-v1.7-clang-x86.obj
+ 0001:000020b8       ??_C@_0BG@MNMHCJLB@smolnes?9native?9window?$AA@ 00000000004030b8     smolnes-v1.7-clang-x86.obj
+ 0001:000020ce       ??_C@_0CN@LIMGGHO@NES?5ROMs?5?$CI?$CK?4nes?$CJ?$AA?$CK?4nes?$AAAll?5files@ 00000000004030ce     smolnes-v1.7-clang-x86.obj
+ 0001:000020fa       ??_C@_00CNPNBAHC@?$AA@     00000000004030fa     smolnes-v1.7-clang-x86.obj
+ 0001:000020fc       _shift_at                  00000000004030fc     smolnes-v1.7-clang-x86.obj
+ 0001:00002100       _chrrom                    0000000000403100     smolnes-v1.7-clang-x86.obj
+ 0001:00002104       _chr                       0000000000403104     smolnes-v1.7-clang-x86.obj
+ 0001:0000210c       _vram                      000000000040310c     smolnes-v1.7-clang-x86.obj
+ 0001:0000290c       _mirror                    000000000040390c     smolnes-v1.7-clang-x86.obj
+ 0001:0000290d       _ram                       000000000040390d     smolnes-v1.7-clang-x86.obj
+ 0001:0000490d       _ppubuf                    000000000040590d     smolnes-v1.7-clang-x86.obj
+ 0001:0000490e       _tmp                       000000000040590e     smolnes-v1.7-clang-x86.obj
+ 0001:00004910       _V                         0000000000405910     smolnes-v1.7-clang-x86.obj
+ 0001:00004912       _chrram                    0000000000405912     smolnes-v1.7-clang-x86.obj
+ 0001:00006912       _palette_ram               0000000000407912     smolnes-v1.7-clang-x86.obj
+ 0001:00006952       _ppuctrl                   0000000000407952     smolnes-v1.7-clang-x86.obj
+ 0001:00006954       _T                         0000000000407954     smolnes-v1.7-clang-x86.obj
+ 0001:00006956       _ppumask                   0000000000407956     smolnes-v1.7-clang-x86.obj
+ 0001:00006957       _W                         0000000000407957     smolnes-v1.7-clang-x86.obj
+ 0001:00006958       _fine_x                    0000000000407958     smolnes-v1.7-clang-x86.obj
+ 0001:00006959       _ppustatus                 0000000000407959     smolnes-v1.7-clang-x86.obj
+ 0001:0000695a       _oam                       000000000040795a     smolnes-v1.7-clang-x86.obj
+ 0001:00006a5a       _keys                      0000000000407a5a     smolnes-v1.7-clang-x86.obj
+ 0001:00006a5b       _prgram                    0000000000407a5b     smolnes-v1.7-clang-x86.obj
+ 0001:00008a5b       _rombuf                    0000000000409a5b     smolnes-v1.7-clang-x86.obj
+ 0001:00108a5b       _prg                       0000000000509a5b     smolnes-v1.7-clang-x86.obj
+ 0001:00108a5f       _mmc3_chrprg               0000000000509a5f     smolnes-v1.7-clang-x86.obj
+ 0001:00108a67       _mmc3_bits                 0000000000509a67     smolnes-v1.7-clang-x86.obj
+ 0001:00108a68       _mmc3_latch                0000000000509a68     smolnes-v1.7-clang-x86.obj
+ 0001:00108a69       _mmc3_irq                  0000000000509a69     smolnes-v1.7-clang-x86.obj
+ 0001:00108a6a       _mmc1_bits                 0000000000509a6a     smolnes-v1.7-clang-x86.obj
+ 0001:00108a6b       _mmc1_data                 0000000000509a6b     smolnes-v1.7-clang-x86.obj
+ 0001:00108a6c       _mmc1_ctrl                 0000000000509a6c     smolnes-v1.7-clang-x86.obj
+ 0001:00108a6d       _chrbank0                  0000000000509a6d     smolnes-v1.7-clang-x86.obj
+ 0001:00108a6e       _chrbank1                  0000000000509a6e     smolnes-v1.7-clang-x86.obj
+ 0001:00108a6f       _prgbank                   0000000000509a6f     smolnes-v1.7-clang-x86.obj
+ 0001:00108a70       _rom                       0000000000509a70     smolnes-v1.7-clang-x86.obj
+ 0001:00108a74       _pc_hi                     0000000000509a74     smolnes-v1.7-clang-x86.obj
+ 0001:00108a75       _PCL                       0000000000509a75     smolnes-v1.7-clang-x86.obj
+ 0001:00108a76       _val                       0000000000509a76     smolnes-v1.7-clang-x86.obj
+ 0001:00108a77       _A                         0000000000509a77     smolnes-v1.7-clang-x86.obj
+ 0001:00108a78       _X                         0000000000509a78     smolnes-v1.7-clang-x86.obj
+ 0001:00108a79       _Y                         0000000000509a79     smolnes-v1.7-clang-x86.obj
+ 0001:00108a7a       _addr_lo                   0000000000509a7a     smolnes-v1.7-clang-x86.obj
+ 0001:00108a7b       _addr_hi                   0000000000509a7b     smolnes-v1.7-clang-x86.obj
+ 0001:00108a7c       _nomem                     0000000000509a7c     smolnes-v1.7-clang-x86.obj
+ 0001:00108a7d       _result                    0000000000509a7d     smolnes-v1.7-clang-x86.obj
+ 0001:00108a7e       _cross                     0000000000509a7e     smolnes-v1.7-clang-x86.obj
+ 0001:00108a7f       _opcode                    0000000000509a7f     smolnes-v1.7-clang-x86.obj
+ 0001:00108a80       _nmi_irq                   0000000000509a80     smolnes-v1.7-clang-x86.obj
+ 0001:00108a81       _ntb                       0000000000509a81     smolnes-v1.7-clang-x86.obj
+ 0001:00108a82       _ptb_lo                    0000000000509a82     smolnes-v1.7-clang-x86.obj
+ 0001:00108a84       _scany                     0000000000509a84     smolnes-v1.7-clang-x86.obj
+ 0001:00108a86       _sum                       0000000000509a86     smolnes-v1.7-clang-x86.obj
+ 0001:00108a88       _dot                       0000000000509a88     smolnes-v1.7-clang-x86.obj
+ 0001:00108a8a       _atb                       0000000000509a8a     smolnes-v1.7-clang-x86.obj
+ 0001:00108a8c       _shift_hi                  0000000000509a8c     smolnes-v1.7-clang-x86.obj
+ 0001:00108a8e       _shift_lo                  0000000000509a8e     smolnes-v1.7-clang-x86.obj
+ 0001:00108a90       _cycles                    0000000000509a90     smolnes-v1.7-clang-x86.obj
+ 0001:00108a92       _frame_buffer              0000000000509a92     smolnes-v1.7-clang-x86.obj
+
+ entry point at         0001:000006c5
+
+ Static symbols
+
+ 0001:0000075f       _run_emulator              000000000040175f     smolnes-v1.7-clang-x86.obj
+ 0001:00001943       _pump_native_messages      0000000000402943     smolnes-v1.7-clang-x86.obj
+ 0001:0000199c       _window_proc@16            000000000040299c     smolnes-v1.7-clang-x86.obj
+ 0001:00001e60       _nes_palette_rgb565        0000000000402e60     smolnes-v1.7-clang-x86.obj
+ 0001:00001ee0       _frame_bitmap_info         0000000000402ee0     smolnes-v1.7-clang-x86.obj
+ 0001:00126a94       _window_focused            0000000000527a94     smolnes-v1.7-clang-x86.obj
+ 0001:00126a98       _rom_dialog                0000000000527a98     smolnes-v1.7-clang-x86.obj
+ 0001:00126af0       _rom_path                  0000000000527af0     smolnes-v1.7-clang-x86.obj
+ 0001:00126bf4       _scanline_sprite_count     0000000000527bf4     smolnes-v1.7-clang-x86.obj
+ 0001:00126bf5       _scanline_sprite_indices   0000000000527bf5     smolnes-v1.7-clang-x86.obj
+ 0001:00126bfd       _scanline_sprite_rows      0000000000527bfd     smolnes-v1.7-clang-x86.obj
+ 0001:00126c05       _scanline_sprite_height    0000000000527c05     smolnes-v1.7-clang-x86.obj
+ 0001:00126c08       _main_window               0000000000527c08     smolnes-v1.7-clang-x86.obj
+ 0001:00126c0c       _app_running               0000000000527c0c     smolnes-v1.7-clang-x86.obj
+ 0001:00126c10       _client_width              0000000000527c10     smolnes-v1.7-clang-x86.obj
+ 0001:00126c14       _client_height             0000000000527c14     smolnes-v1.7-clang-x86.obj
+ 0001:00126c18       _frame_timer_16            0000000000527c18     smolnes-v1.7-clang-x86.obj
+ 0001:00126c1c       _frame_timer_50            0000000000527c1c     smolnes-v1.7-clang-x86.obj
+ 0001:00126c20       _frame_wait_count          0000000000527c20     smolnes-v1.7-clang-x86.obj

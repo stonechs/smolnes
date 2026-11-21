@@ -63,16 +63,9 @@ static HWND main_window;
 static int app_running = 1;
 static int window_focused;
 static int client_width, client_height;
-static HANDLE frame_timer;
+static HANDLE frame_timer_16, frame_timer_50;
 static LARGE_INTEGER frame_frequency;
-static LARGE_INTEGER next_frame_deadline;
-#if defined(_WIN64)
-static LONGLONG frame_tick_remainder;
-#else
-static DWORD frame_ticks_per_frame;
-static DWORD frame_tick_remainder;
-static DWORD frame_tick_remainder_accumulator;
-#endif
+static unsigned frame_wait_count;
 
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
 static FILE *frame_timing_log;
@@ -88,10 +81,6 @@ static DWORD fps_sample_start;
 static unsigned fps_sample_frames;
 #endif
 
-#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
-#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x00000002
-#endif
-
 typedef struct {
   BITMAPINFOHEADER header;
   DWORD masks[3];
@@ -105,11 +94,6 @@ static uint8_t scanline_sprite_indices[8];
 static uint8_t scanline_sprite_rows[8];
 static uint8_t scanline_sprite_count;
 static uint8_t scanline_sprite_height;
-static uint8_t scanline_background_color[256];
-static uint8_t scanline_background_palette[256];
-static uint8_t scanline_sprite_pixel_color[256];
-static uint8_t scanline_sprite_pixel_attributes[256];
-static uint8_t scanline_sprite_pixel_owner[256];
 
 uint8_t *get_chr_byte(uint16_t a);
 
@@ -139,14 +123,10 @@ static int key_is_down(int virtual_key) {
   return window_focused && (GetAsyncKeyState(virtual_key) & 0x8000) != 0;
 }
 
-// Prepare the current scanline's sprite list once, instead of searching all
-// 64 OAM entries for every visible pixel. The first eight in-range sprites
-// retain OAM priority, matching the NES per-scanline sprite limit.
+// Prepare the current scanline's first eight in-range sprites.
 static void prepare_scanline_sprites(void) {
   scanline_sprite_count = 0;
   scanline_sprite_height = (ppuctrl & 32) ? 16 : 8;
-  for (uint16_t x = 0; x < 256; x++)
-    scanline_sprite_pixel_owner[x] = 0;
   if (scany >= 240)
     return;
 
@@ -158,37 +138,7 @@ static void prepare_scanline_sprites(void) {
       scanline_sprite_count++;
     }
   }
-
-  // Decode the selected sprites once for this scanline and preserve the
-  // first opaque OAM pixel at each screen position.
-  for (uint8_t candidate = 0; candidate < scanline_sprite_count; candidate++) {
-    uint8_t sprite_index = scanline_sprite_indices[candidate];
-    uint8_t *sprite = oam + sprite_index * 4;
-    uint16_t row = scanline_sprite_rows[candidate];
-    uint16_t tile = sprite[1];
-    uint16_t sy = row ^ (sprite[2] & 128 ? scanline_sprite_height - 1 : 0);
-    uint16_t address =
-        (ppuctrl & 32
-             ? tile % 2 << 12 | tile << 4 & -32 | sy * 2 & 16
-             : (ppuctrl & 8) << 9 | tile << 4) |
-        sy & 7;
-    uint8_t low = *get_chr_byte(address);
-    uint8_t high = *get_chr_byte(address + 8);
-
-    for (uint16_t x = 0; x < 8; x++) {
-      uint16_t screen_x = sprite[3] + x;
-      uint16_t bit = x ^ (!(sprite[2] & 64) * 7);
-      uint8_t color = high >> bit << 1 & 2 | low >> bit & 1;
-      if (screen_x < 256 && color && !scanline_sprite_pixel_owner[screen_x]) {
-        scanline_sprite_pixel_color[screen_x] = color;
-        scanline_sprite_pixel_attributes[screen_x] = sprite[2];
-        scanline_sprite_pixel_owner[screen_x] = sprite_index + 1;
-      }
-    }
-  }
-}
-
-static void paint_frame(HDC dc, const RECT *client) {
+}static void paint_frame(HDC dc, const RECT *client) {
   int width = client->right - client->left;
   int height = client->bottom - client->top;
   if (width <= 0 || height <= 0)
@@ -202,8 +152,6 @@ static void paint_frame(HDC dc, const RECT *client) {
 static LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam,
                                     LPARAM lparam) {
   switch (message) {
-  case WM_NCCREATE:
-    return TRUE;
   case WM_CLOSE:
     DestroyWindow(hwnd);
     return 0;
@@ -219,14 +167,6 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam,
     return 0;
   case WM_KILLFOCUS:
     window_focused = 0;
-    return 0;
-  case WM_KEYDOWN:
-    if (wparam == VK_ESCAPE)
-      DestroyWindow(hwnd);
-    return 0;
-  case WM_SYSKEYDOWN:
-    if (wparam == VK_F4)
-      DestroyWindow(hwnd);
     return 0;
   case WM_PAINT: {
     PAINTSTRUCT paint;
@@ -271,102 +211,70 @@ static int pump_native_messages(void) {
   return app_running;
 }
 
-static void advance_frame_deadline(void) {
-#if defined(_WIN64)
-  next_frame_deadline.QuadPart += frame_frequency.QuadPart / 60;
-  frame_tick_remainder += frame_frequency.QuadPart % 60;
-  if (frame_tick_remainder >= 60) {
-    next_frame_deadline.QuadPart++;
-    frame_tick_remainder -= 60;
-  }
+#ifndef SMOLNES_OMIT_TIMER_FAILURE_CHECKS
+#define SMOLNES_TIMER_CHECK(expression) \
+  do {                                      \
+    if (!(expression))                     \
+      goto timer_setup_failed;             \
+  } while (0)
 #else
-  next_frame_deadline.QuadPart += frame_ticks_per_frame;
-  frame_tick_remainder_accumulator += frame_tick_remainder;
-  if (frame_tick_remainder_accumulator >= 60) {
-    next_frame_deadline.QuadPart++;
-    frame_tick_remainder_accumulator -= 60;
-  }
-#endif
-}
-
-static int initialize_frame_timer(void) {
-  if (!QueryPerformanceFrequency(&frame_frequency))
-    return 0;
-#if !defined(_WIN64)
-  if (frame_frequency.HighPart != 0 ||
-      (LONG)frame_frequency.LowPart <= 0)
-    ExitProcess(1);
-  frame_ticks_per_frame = frame_frequency.LowPart / 60u;
-  frame_tick_remainder = frame_frequency.LowPart % 60u;
+#define SMOLNES_TIMER_CHECK(expression) ((void)(expression))
 #endif
 
-  frame_timer = CreateWaitableTimerExA(NULL, NULL,
-                                       CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
-                                       TIMER_ALL_ACCESS);
-  if (!frame_timer)
-    frame_timer = CreateWaitableTimerA(NULL, FALSE, NULL);
-  if (!frame_timer || !QueryPerformanceCounter(&next_frame_deadline)) {
-    if (frame_timer) {
-      CloseHandle(frame_timer);
-      frame_timer = NULL;
-    }
-    return 0;
-  }
-#if defined(_WIN64)
-  frame_tick_remainder = 0;
-#else
-  frame_tick_remainder_accumulator = 0;
-#endif
+static int initialize_frame_timers(void) {
+  LARGE_INTEGER first_16ms, first_50ms;
+  first_16ms.QuadPart = -160000;
+  first_50ms.QuadPart = -500000;
+  frame_timer_16 = CreateWaitableTimerA(NULL, FALSE, NULL);
+  SMOLNES_TIMER_CHECK(frame_timer_16 != NULL);
+  frame_timer_50 = CreateWaitableTimerA(NULL, FALSE, NULL);
+  SMOLNES_TIMER_CHECK(frame_timer_50 != NULL);
+  SMOLNES_TIMER_CHECK(
+      SetWaitableTimer(frame_timer_16, &first_16ms, 16, NULL, NULL, FALSE));
+  SMOLNES_TIMER_CHECK(
+      SetWaitableTimer(frame_timer_50, &first_50ms, 50, NULL, NULL, FALSE));
   return 1;
+#ifndef SMOLNES_OMIT_TIMER_FAILURE_CHECKS
+timer_setup_failed:
+  if (frame_timer_16) {
+    CancelWaitableTimer(frame_timer_16);
+    CloseHandle(frame_timer_16);
+    frame_timer_16 = NULL;
+  }
+  if (frame_timer_50) {
+    CancelWaitableTimer(frame_timer_50);
+    CloseHandle(frame_timer_50);
+    frame_timer_50 = NULL;
+  }
+  return 0;
+#endif
 }
 
-// Pace completed frames to 60 Hz. Deadlines stay anchored to QPC time, and
-// missed ticks are skipped instead of being queued for catch-up frames.
+#undef SMOLNES_TIMER_CHECK
+// Pace two frames at 16 ms, then synchronize the third to the 50 ms timer.
 static int wait_for_next_frame(void) {
-  LARGE_INTEGER now;
-  LARGE_INTEGER due_time;
+  LARGE_INTEGER first_16ms;
+  HANDLE timer;
+  DWORD result;
 
-  if (!QueryPerformanceCounter(&now))
-    return 0;
-
-  advance_frame_deadline();
-  if (next_frame_deadline.QuadPart <= now.QuadPart) {
-    // The frame missed its deadline. Skip elapsed ticks and immediately
-    // continue; waiting for a later tick here would unnecessarily halve the
-    // frame rate whenever rendering ran just over budget.
-    do {
-      advance_frame_deadline();
-      if (!QueryPerformanceCounter(&now))
-        return 0;
-    } while (next_frame_deadline.QuadPart <= now.QuadPart);
-    return app_running;
+  if (++frame_wait_count == 3) {
+    frame_wait_count = 0;
+    timer = frame_timer_50;
+  } else {
+    timer = frame_timer_16;
   }
-
-#if defined(_WIN64)
-  LONGLONG ticks_to_wait = next_frame_deadline.QuadPart - now.QuadPart;
-  LONGLONG wait_100ns =
-      (ticks_to_wait * 10000000LL + frame_frequency.QuadPart - 1) /
-      frame_frequency.QuadPart;
-  if (wait_100ns < 1)
-    wait_100ns = 1;
-  due_time.QuadPart = -wait_100ns;
-#else
-  LONG ticks_to_wait =
-      (LONG)(next_frame_deadline.QuadPart - now.QuadPart);
-  LONG wait_100ns =
-      MulDiv(ticks_to_wait, 10000000, (LONG)frame_frequency.LowPart);
-  if (wait_100ns < 1)
-    wait_100ns = 1;
-  due_time.QuadPart = -(LONGLONG)(wait_100ns + 1);
-#endif
-  if (!SetWaitableTimer(frame_timer, &due_time, 0, NULL, NULL, FALSE))
-    return 0;
-
   for (;;) {
-    DWORD result = MsgWaitForMultipleObjects(1, &frame_timer, FALSE, INFINITE,
-                                             QS_ALLINPUT);
-    if (result == WAIT_OBJECT_0)
+    result = MsgWaitForMultipleObjects(1, &timer, FALSE, INFINITE, QS_ALLINPUT);
+    if (result == WAIT_OBJECT_0) {
+      if (frame_wait_count == 0) {
+        // Re-anchor the 16 ms cadence at each 50 ms boundary.
+        first_16ms.QuadPart = -160000;
+        if (!SetWaitableTimer(frame_timer_16, &first_16ms, 16,
+                              NULL, NULL, FALSE))
+          return 0;
+      }
       return app_running;
+    }
     if (result == WAIT_OBJECT_0 + 1) {
       if (!pump_native_messages())
         return 0;
@@ -375,7 +283,6 @@ static int wait_for_next_frame(void) {
     return 0;
   }
 }
-
 // Read a byte from CHR ROM or CHR RAM.
 uint8_t *get_chr_byte(uint16_t a) {
   return &chrrom[chr[a >> chrbits] << chrbits | a % (1 << chrbits)];
@@ -576,6 +483,17 @@ static char rom_path[MAX_PATH];
 static OPENFILENAMEA rom_dialog;
 
 static char *select_rom_file(void) {
+  char *p = GetCommandLineA();
+  if (*p == '"') {
+    ++p;
+    while (*p && *p != '"') ++p;
+    if (*p) ++p;
+  } else {
+    while (*p && *p != ' ') ++p;
+  }
+  while (*p == ' ') ++p;
+  if (*p)
+    return p;
   rom_dialog.lStructSize = sizeof rom_dialog;
   rom_dialog.lpstrFile = rom_path;
   rom_dialog.nMaxFile = sizeof rom_path;
@@ -627,10 +545,10 @@ static int run_emulator(const char *rom_path) {
   SMOLNES_FAIL_IF(!window_created,
                   SMOLNES_ERROR_DIALOG(
                       "Could not create the emulator window", "smolnes"));
-  int timer_initialized = initialize_frame_timer();
+  int timer_initialized = initialize_frame_timers();
   SMOLNES_FAIL_IF(!timer_initialized,
                   (SMOLNES_ERROR_DIALOG(
-                       "Could not initialize the frame timer", "smolnes"),
+                       "Could not initialize the frame timers", "smolnes"),
                    DestroyWindow(main_window)));
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
   frame_timing_log = fopen("frame-time.csv", "w");
@@ -923,29 +841,43 @@ loop:
         if (dot - 256 > 63u) {  // dot [0..255,320..340]
           // Draw a pixel to the framebuffer.
           if (dot < 256) {
-            // Sample background color from the existing dot pipeline.
-            scanline_background_color[dot] =
-                shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1;
-            scanline_background_palette[dot] =
-                shift_at >> 28 - fine_x * 2 & 12;
-            uint8_t color = scanline_background_color[dot],
-                    palette = scanline_background_palette[dot];
+            uint8_t color =
+                       shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+                    palette = shift_at >> 28 - fine_x * 2 & 12;
 
-            // Composite the predecoded first opaque sprite pixel, if enabled.
             if (ppumask & 16) {
-              uint8_t owner = scanline_sprite_pixel_owner[dot];
-              if (owner) {
-                uint8_t sprite_color = scanline_sprite_pixel_color[dot];
-                uint8_t attributes = scanline_sprite_pixel_attributes[dot];
-                if (!(attributes & 32 && color)) {
-                  color = sprite_color;
-                  palette = 16 | attributes * 4 & 12;
+              for (uint8_t candidate = 0;
+                   candidate < scanline_sprite_count; candidate++) {
+                uint8_t sprite_index = scanline_sprite_indices[candidate];
+                uint8_t *sprite = oam + sprite_index * 4;
+                uint16_t sprite_x = dot - sprite[3];
+                if (sprite_x < 8) {
+                  uint16_t row = scanline_sprite_rows[candidate];
+                  uint16_t sx = sprite_x ^ (!(sprite[2] & 64) * 7);
+                  uint16_t sy =
+                      row ^ (sprite[2] & 128 ? scanline_sprite_height - 1 : 0);
+                  uint16_t sprite_tile = sprite[1],
+                           sprite_addr =
+                               (ppuctrl & 32
+                                    ? sprite_tile % 2 << 12 |
+                                          sprite_tile << 4 & -32 | sy * 2 & 16
+                                    : (ppuctrl & 8) << 9 | sprite_tile << 4) |
+                               sy & 7;
+                  uint8_t sprite_color =
+                      *get_chr_byte(sprite_addr + 8) >> sx << 1 & 2 |
+                      *get_chr_byte(sprite_addr) >> sx & 1;
+                  if (sprite_color) {
+                    if (!(sprite[2] & 32 && color)) {
+                      color = sprite_color;
+                      palette = 16 | sprite[2] * 4 & 12;
+                    }
+                    if (sprite_index == 0 && color)
+                      ppustatus |= 64;
+                    break;
+                  }
                 }
-                if (owner == 1 && color)
-                  ppustatus |= 64;
               }
             }
-
             frame_buffer[scany * 256 + dot] =
                 nes_palette_rgb565[palette_ram[color ? palette | color : 0]];
           }
@@ -1117,9 +1049,13 @@ shutdown:
   if (frame_timing_log)
     fclose(frame_timing_log);
 #endif
-  CancelWaitableTimer(frame_timer);
-  CloseHandle(frame_timer);
-  frame_timer = NULL;
+#ifndef SMOLNES_OMIT_TIMER_SHUTDOWN_CLEANUP
+  CancelWaitableTimer(frame_timer_16);
+  CancelWaitableTimer(frame_timer_50);
+  CloseHandle(frame_timer_16);
+  CloseHandle(frame_timer_50);
+  frame_timer_16 = frame_timer_50 = NULL;
+#endif
   return 0;
 }
 
@@ -1129,3 +1065,4 @@ void mainCRTStartup(void) {
     ExitProcess(0);
   ExitProcess((UINT)run_emulator(rom_path));
 }
+

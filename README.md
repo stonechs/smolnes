@@ -104,7 +104,7 @@ Let me know if you've used smolnes and I'll add it to the list.
 
 ## V1.x source layout
 
-The original upstream SDL sources are in `src/org/`. The latest Windows-native V1.x source is under `dist/V1.6/candidate/source/`. The frozen V1 executable remains under `dist/V1/`; its separate build snapshot is no longer included in this branch.
+The original upstream SDL sources are in `src/org/`. The current Windows-native V1.x source is `src/deobfuscated_win32.c` (V1.7); frozen versioned build snapshots are under `dist/`. The V1 executable remains under `dist/V1/`; its separate build snapshot is no longer included in this branch.
 ## V1.4 candidate
 
 The V1.4 dual-timer release candidate for the V1.x line is under `dist/V1.4/candidate/`. Only the extreme timer-size build is included; see [its release notes](docs/releases/README-V1.4.md). Runtime pacing and game compatibility have not yet been validated.
@@ -115,4 +115,8 @@ V1.5 retains the scanline selection of up to eight sprites from 64 and uses on-d
 ## V1.6 release
 
 V1.6 keeps the V1.5 emulator source and builds it with Clang/LLVM 23.1.5. The x86 packed asset uses Crinkler 3.0b and the x64 packed asset uses UPX 5.3.0. Four x86/x64 executables and their build inputs are under [dist/V1.6/candidate/](dist/V1.6/candidate/). See [V1.6 release notes](docs/releases/README-V1.6.md).
+
+## V1.7 candidate
+
+V1.7 retains the ROM file dialog and adds optional loading of one simple ROM filename from the current working directory. The x86 Crinkler build, both x64 outputs, and frozen source snapshot are under [dist/V1.7/](dist/V1.7/), with source in `dist/V1.7/src/`. The current source is `src/deobfuscated_win32.c`. See [V1.7 release notes](docs/releases/README-V1.7.md).
 

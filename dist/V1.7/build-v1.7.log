@@ -1,0 +1,222 @@
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:24: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                     ~~~^~~ ~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:24: note: place parentheses around the '-' expression to silence this warning
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                        ^
+      |                     (     )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:39: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                            ~~ ~~~~~~~~^~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:39: note: place parentheses around the '-' expression to silence this warning
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                                       ^   
+      |                               (           )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:64: warning: operator '<<' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                                                          ~~ ~~~^~~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:64: note: place parentheses around the '-' expression to silence this warning
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                                                                ^        
+      |                                                             (           )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:618:19: warning: operator '>>' has lower precedence than '+'; '+' will be evaluated first [-Wshift-op-parentheses]
+  618 |       cross = PCL + (int8_t)val >> 8;
+      |               ~~~~^~~~~~~~~~~~~ ~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:618:19: note: place parentheses around the '+' expression to silence this warning
+  618 |       cross = PCL + (int8_t)val >> 8;
+      |                   ^
+      |               (                )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:742:42: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
+  742 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:742:42: note: place parentheses around the '|' expression to silence this warning
+  742 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
+      |                                          ^
+      |           (                             )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:742:42: note: place parentheses around the '?:' expression to evaluate it first
+  742 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
+      |                                          ^      
+      |                            (                    )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:817:55: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
+  817 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
+      |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:817:55: note: place parentheses around the '|' expression to silence this warning
+  817 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
+      |                                                       ^
+      |                      (                               )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:817:55: note: place parentheses around the '?:' expression to evaluate it first
+  817 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
+      |                                                       ^
+      |                                        (
+  818 |                      : opcode % 4 == 1                ? &A
+  819 |                                                       : &Y;
+      |                                                           
+      |                                                           )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:39: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                 ~~ ~~~^~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:39: note: place parentheses around the '-' expression to silence this warning
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                       ^
+      |                                    (          )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:69: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                                               ~~ ~~~^~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:69: note: place parentheses around the '-' expression to silence this warning
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                                                     ^
+      |                                                                  (          )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:846:46: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  846 |                     palette = shift_at >> 28 - fine_x * 2 & 12;
+      |                                        ~~ ~~~^~~~~~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:846:46: note: place parentheses around the '-' expression to silence this warning
+  846 |                     palette = shift_at >> 28 - fine_x * 2 & 12;
+      |                                              ^
+      |                                           (              )
+9 warnings generated.
+lld-link: warning: .idata=.rdata: already merged into .text
+Crinkler 3.0b (Jul 30 2026) (c) 2005-2026 Aske Simon Christensen & Rune Stubbe
+
+Target: D:\2026work\smolnes_v1X\dist\V1.7\candidate\release\smolnes-v1.7-clang-x86-crinkler.exe
+Tiny compressor: NO
+Tiny import: NO
+Subsystem type: WINDOWS
+Large address aware: NO
+Compression mode: FAST
+Saturate counters: NO
+Hash size: 32 MB
+Hash tries: 100
+Order tries: 0
+Reuse mode: OFF (no file specified)
+Report: NONE
+Transforms: CALLS
+Replace DLLs: NONE
+Fallback DLLs: NONE
+Range DLLs: NONE
+Exports: NONE
+
+Loading D:\2026work\smolnes_v1X\dist\V1.7\candidate\build-support\objects\smolnes-v1.7-clang-x86.obj...
+Loading kernel32.lib...
+Loading user32.lib...
+Loading gdi32.lib...
+Loading comdlg32.lib...
+
+Linking...
+
+
+: warning LNK: Import 'DefWindowProcA' from 'user32' uses forwarded RVA. Replaced by 'NtdllDefWindowProc_A' from 'ntdll'
+Total text size: 166
+
+Calls transformed: 51
+
+Uncompressed size of Code:                6973
+Uncompressed size of Data:                 865
+Uncompressed size of Uninitialized:    1256678
+
+|-- Estimating models for Code ----------------------------|
+............................................................   0m00s
+Estimated compressed size of Code: 3757.34
+
+|-- Estimating models for Data ----------------------------|
+............................................................   0m00s
+Estimated compressed size of Data: 406.18
+
+Ideal compressed size of Code: 3757.34
+Ideal compressed size of Data: 406.18
+Ideal compressed total size: 4163.52
+
+|-- Optimizing hash table size ----------------------------|
+............................................................   0m01s
+Real compressed total size: 4196
+Bytes lost to hashing: 32.48
+
+
+Output file: D:\2026work\smolnes_v1X\dist\V1.7\candidate\release\smolnes-v1.7-clang-x86-crinkler.exe
+Final file size: 4565 (no change)
+
+time spent: 0m02s
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:24: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                     ~~~^~~ ~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:24: note: place parentheses around the '-' expression to silence this warning
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                        ^
+      |                     (     )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:39: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                            ~~ ~~~~~~~~^~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:39: note: place parentheses around the '-' expression to silence this warning
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                                       ^   
+      |                               (           )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:64: warning: operator '<<' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                                                          ~~ ~~~^~~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:464:64: note: place parentheses around the '-' expression to silence this warning
+  464 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+      |                                                                ^        
+      |                                                             (           )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:618:19: warning: operator '>>' has lower precedence than '+'; '+' will be evaluated first [-Wshift-op-parentheses]
+  618 |       cross = PCL + (int8_t)val >> 8;
+      |               ~~~~^~~~~~~~~~~~~ ~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:618:19: note: place parentheses around the '+' expression to silence this warning
+  618 |       cross = PCL + (int8_t)val >> 8;
+      |                   ^
+      |               (                )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:742:42: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
+  742 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:742:42: note: place parentheses around the '|' expression to silence this warning
+  742 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
+      |                                          ^
+      |           (                             )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:742:42: note: place parentheses around the '?:' expression to evaluate it first
+  742 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
+      |                                          ^      
+      |                            (                    )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:817:55: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
+  817 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
+      |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:817:55: note: place parentheses around the '|' expression to silence this warning
+  817 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
+      |                                                       ^
+      |                      (                               )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:817:55: note: place parentheses around the '?:' expression to evaluate it first
+  817 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
+      |                                                       ^
+      |                                        (
+  818 |                      : opcode % 4 == 1                ? &A
+  819 |                                                       : &Y;
+      |                                                           
+      |                                                           )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:39: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                 ~~ ~~~^~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:39: note: place parentheses around the '-' expression to silence this warning
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                       ^
+      |                                    (          )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:69: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                                               ~~ ~~~^~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:845:69: note: place parentheses around the '-' expression to silence this warning
+  845 |                        shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1,
+      |                                                                     ^
+      |                                                                  (          )
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:846:46: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
+  846 |                     palette = shift_at >> 28 - fine_x * 2 & 12;
+      |                                        ~~ ~~~^~~~~~~~~~~~
+D:\2026work\smolnes_v1X\src\deobfuscated_win32.c:846:46: note: place parentheses around the '-' expression to silence this warning
+  846 |                     palette = shift_at >> 28 - fine_x * 2 & 12;
+      |                                              ^
+      |                                           (              )
+9 warnings generated.
+                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2026
+UPX 5.3.0       Markus Oberhumer, Laszlo Molnar & John Reiser   Oct 28th 2026
+
+        File size         Ratio      Format      Name
+   --------------------   ------   -----------   -----------
+     11264 ->      8192   72.73%    win64/pe     smolnes-v1.7-clang-x64-upx.exe
+
+Packed 1 file.

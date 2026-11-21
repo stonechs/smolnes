@@ -1,0 +1,11 @@
+Version: V1.7 candidate
+File: smolnes-v1.7-clang-x86.exe
+Size: 9216 B
+SHA256: 475258664ACAE3E54A9ADFCAB6D56BCE95A932AD685FF475B63648B2CD757483
+Architecture: x86
+Compiler: Clang/LLVM 23.1.5
+Target: i686-pc-windows-msvc
+Compile: -Oz -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -ffunction-sections -fdata-sections
+Linker: LLD; /OPT:REF /OPT:ICF /FIXED; merge .rdata/.data/.idata into RWX .text
+LTO: no
+Source SHA256: 182BE5ACDE90960A575C032BB3467E9F682A94756C07DE2F30F483CE014D647D
