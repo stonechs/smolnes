@@ -104,4 +104,4 @@ Let me know if you've used smolnes and I'll add it to the list.
 
 ## Windows documentation and releases
 
-Original upstream C sources are in `src/org/`; the current V3 Windows source is in `src/`. General documentation is in [docs/](docs/README.md). Versioned release packages are under [dist/](dist/): V1, V1.2, V2, and V3. The V1 guide is in [docs/releases/README-V1.md](docs/releases/README-V1.md); its source, build script, and checksum snapshot are grouped under `archive/V1-release/`. The V1.2 scanline migration notes are in [docs/plans/PPU_SCANLINE_MIGRATION.md](docs/plans/PPU_SCANLINE_MIGRATION.md).
+Original upstream C sources are in `src/org/`; the current V3 Windows source is in `src/`. General documentation is in [docs/](docs/README.md). Versioned release packages are under [dist/](dist/): V1, V1.2, V2, V3, and [V3.3](dist/V3.3/final/README.md) (DMC audio). The V1 guide is in [docs/releases/README-V1.md](docs/releases/README-V1.md); its source, build script, and checksum snapshot are grouped under `archive/V1-release/`. The V1.2 scanline migration notes are in [docs/plans/PPU_SCANLINE_MIGRATION.md](docs/plans/PPU_SCANLINE_MIGRATION.md).
