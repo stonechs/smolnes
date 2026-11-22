@@ -6,5 +6,40 @@ build
 .vs
 CMakeSettings.json
 
+# Generated root build caches
+/build-size-osgc/
+/build-windows/
+/2026worksmolnesdistV1.3size-experimentsdata-section-tracetrace.lto_wrapper_args
+
 # Local historical snapshots; keep out of the repository
 /archive/
+
+# Local V1.x package snapshots
+/dist/V1.1/
+/dist/V1.3/
+/dist/V1.4/
+/dist/V1.5/
+/dist/V1.6/
+/dist/V1.7/
+
+# Local experiments and generated test artifacts
+/dist/experiments/
+/dist/V3/experiments/
+/dist/V3/final/.github/
+/dist/V3/final/results/AUDIO_REGRESSION_STATUS.md
+/dist/V3/final/results/V3_SIZE_OPTIMIZATION_RESULTS.md
+/dist/README.md
+/dist/V1.2/final-pig-rom-smoke.log
+/dist/V1.2/github-package/PPU_SCANLINE_MIGRATION.md
+/dist/V1.2/smolnes-v1.2-sha256.txt
+/dist/V1.2/smolnes-v1.2-source.zip
+/dist/V1.2/smolnes-v1.2.exe
+/dist/V2/SHA256SUMS.txt
+/dist/V2/final-apu-rom-smoke.log
+/dist/V2/final-pig-rom-smoke.log
+
+# Local scripts, tools and editor workspace
+/scripts/
+/tools/
+/smolnes.code-workspace
+

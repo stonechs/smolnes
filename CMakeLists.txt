@@ -5,17 +5,19 @@ project(smolnes)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
 
 option(SMOLNES_VENDORED "Use vendored dependencies" ${WIN32})
+set(SMOLNES_SDL_SOURCE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/archive/V3-baselines/root-sdl-original-2026-11-15/source")
 
 if(SMOLNES_VENDORED)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out")
-    add_subdirectory(SDL EXCLUDE_FROM_ALL)
+    add_subdirectory(archive/SDL EXCLUDE_FROM_ALL)
 else()
     find_package(SDL2 REQUIRED CONFIG REQUIRED COMPONENTS SDL2)
     find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
 endif()
 
-add_executable(smolnes WIN32 src/org/smolnes.c)
-add_executable(deobfuscated WIN32 src/org/deobfuscated.c)
+add_executable(smolnes WIN32 "${SMOLNES_SDL_SOURCE_DIR}/smolnes.c")
+add_executable(deobfuscated WIN32 "${SMOLNES_SDL_SOURCE_DIR}/deobfuscated.c")
 if(WIN32)
     add_executable(deobfuscated_win32 WIN32
         src/deobfuscated_win32.c

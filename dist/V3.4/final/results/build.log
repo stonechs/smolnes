@@ -10,14 +10,14 @@ D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:39: warning:
       |                            ~~ ~~~~~~~~^~~~
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:39: note: place parentheses around the '-' expression to silence this warning
   580 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
-      |                                       ^
+      |                                       ^   
       |                               (           )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:64: warning: operator '<<' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
   580 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
       |                                                          ~~ ~~~^~~~~~~~~
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:64: note: place parentheses around the '-' expression to silence this warning
   580 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
-      |                                                                ^
+      |                                                                ^        
       |                                                             (           )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:769:19: warning: operator '>>' has lower precedence than '+'; '+' will be evaluated first [-Wshift-op-parentheses]
   769 |       cross = PCL + (int8_t)val >> 8;
@@ -35,7 +35,7 @@ D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:893:42: note: pl
       |           (                             )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:893:42: note: place parentheses around the '?:' expression to evaluate it first
   893 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
-      |                                          ^
+      |                                          ^      
       |                            (                    )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:968:55: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
   968 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
@@ -50,7 +50,7 @@ D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:968:55: note: pl
       |                                        (
   969 |                      : opcode % 4 == 1                ? &A
   970 |                                                       : &Y;
-      |
+      |                                                           
       |                                                           )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:1006:32: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
  1006 |                 shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1;
@@ -151,14 +151,14 @@ D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:39: warning:
       |                            ~~ ~~~~~~~~^~~~
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:39: note: place parentheses around the '-' expression to silence this warning
   580 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
-      |                                       ^
+      |                                       ^   
       |                               (           )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:64: warning: operator '<<' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
   580 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
       |                                                          ~~ ~~~^~~~~~~~~
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:580:64: note: place parentheses around the '-' expression to silence this warning
   580 |     return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
-      |                                                                ^
+      |                                                                ^        
       |                                                             (           )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:769:19: warning: operator '>>' has lower precedence than '+'; '+' will be evaluated first [-Wshift-op-parentheses]
   769 |       cross = PCL + (int8_t)val >> 8;
@@ -176,7 +176,7 @@ D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:893:42: note: pl
       |           (                             )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:893:42: note: place parentheses around the '?:' expression to evaluate it first
   893 |     val = opcodelo5 < 28 | opcode == 190 ? Y : X;
-      |                                          ^
+      |                                          ^      
       |                            (                    )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:968:55: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
   968 |       uint8_t *reg = opcode % 4 == 2 | opcodehi3 == 7 ? &X
@@ -191,7 +191,7 @@ D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:968:55: note: pl
       |                                        (
   969 |                      : opcode % 4 == 1                ? &A
   970 |                                                       : &Y;
-      |
+      |                                                           
       |                                                           )
 D:\2026work\smolnes\dist\V3.4\final\source\deobfuscated_win32.c:1006:32: warning: operator '>>' has lower precedence than '-'; '-' will be evaluated first [-Wshift-op-parentheses]
  1006 |                 shift_hi >> 14 - fine_x & 2 | shift_lo >> 15 - fine_x & 1;

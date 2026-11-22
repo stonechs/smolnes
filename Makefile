@@ -14,11 +14,12 @@ WARN=-std=c99 \
 		 -Wno-char-subscripts \
 		 -Wno-switch
 SDLFLAGS=$(shell pkg-config --cflags --libs sdl2)
+SDL_SOURCE_DIR=archive/V3-baselines/root-sdl-original-2026-11-15/source
 
-smolnes: src/org/smolnes.c
+smolnes: $(SDL_SOURCE_DIR)/smolnes.c
 	$(CC) -O2 -o $@ $< ${SDLFLAGS} -g ${WARN}
 
-deobfuscated: src/org/deobfuscated.c
+deobfuscated: $(SDL_SOURCE_DIR)/deobfuscated.c
 	$(CC) -O2 -o $@ $< ${SDLFLAGS} -g ${WARN}
 
 clean:

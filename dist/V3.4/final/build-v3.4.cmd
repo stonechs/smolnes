@@ -41,3 +41,4 @@ if errorlevel 1 exit /b 1
 "%UPXBIN%" -t "%REL%\smolnes-v3.4-clang-x64-upx.exe"
 if errorlevel 1 exit /b 1
 endlocal
+

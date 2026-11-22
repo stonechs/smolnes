@@ -68,7 +68,7 @@ Keys:
 
 ## Updating keys
 
-Look at `src/org/smolnes.c` around line 20. The following table shows which
+Look for line 20 in the source code. The following table shows which
 numbers map to which keyboard keys:
 
 | character | number | default key | NES button |
@@ -102,6 +102,14 @@ numbers map to which keyboard keys:
 
 Let me know if you've used smolnes and I'll add it to the list.
 
-## Windows documentation and releases
+## Windows project layout
 
-Original upstream C sources are in `src/org/`; the current V3 Windows source is in `src/`. General documentation is in [docs/](docs/README.md). Versioned release packages are under [dist/](dist/): V1, V1.2, V2, V3, [V3.3](dist/V3.3/final/README.md) (DMC audio), and [V3.4](dist/V3.4/final/README.md) (integer audio, 50ms buffer). The V1 guide is in [docs/releases/README-V1.md](docs/releases/README-V1.md); its source, build script, and checksum snapshot are grouped under `archive/V1-release/`. The V1.2 scanline migration notes are in [docs/plans/PPU_SCANLINE_MIGRATION.md](docs/plans/PPU_SCANLINE_MIGRATION.md).
+- `src/deobfuscated_win32.c` is the current Windows source. The original SDL variants are preserved under `archive/V3-baselines/root-sdl-original-2026-11-15/source/`.
+- `src/apu.c`, `src/apu.h`, `src/audio_win32.c`, and `src/audio_win32.h` hold the V2 audio implementation.
+- `dist/V1.3/final/` contains the finalized V1.3 source snapshot, build inputs, maps, and x86/x64 executables.
+- dist/V1.4/candidate/ contains the V1.4 dual-timer candidate.
+- dist/V1.5/candidate/ contains the corrected scanline rollback candidate, build inputs, maps, and x86/x64 executables.
+- `scripts/` contains smoke, diagnostic, and release-packing scripts. See `docs/` for plans and version notes.
+- `archive/` retains prior snapshots, build artifacts, and the SDL submodule used by archived SDL targets. `roms/`, `img/`, and `tools/` hold project assets and build tools.
+
+
