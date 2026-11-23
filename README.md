@@ -1,5 +1,9 @@
 # smolnes
 
+![V1.X minimum-size executable: 4.5 KB (4,565 bytes)](docs/assets/v1x-minimum-size.svg)
+
+V1.X's smallest listed output is the V1.7 x86 Clang + Crinkler build at 4,565 B.
+
 Compact NES emulator in C with Windows-native V1.X and V3 development lines. The supported mapper set is 0, 1, 2, 3, 4, and 7.
 
 ## Changes from upstream
@@ -32,7 +36,7 @@ The V1.X source and release files are maintained on the [`v1.x-windows-native` b
 
 ### V3
 
-V3.2 moved audio output to WinMM window callbacks. V3.3 added DMC playback. V3.4 uses integer audio synthesis and mixing, a 60 fps audio clock, and a 50 ms playback queue while retaining dual-timer frame pacing.
+V3.2 moved audio output to WinMM window callbacks. V3.3 added NES DMC (1-bit DPCM) playback, making the drum samples in Contra's background music clearly audible and improving its sound. V3.4 uses integer audio synthesis and mixing, a 60 fps audio clock, and a 50 ms playback queue while retaining dual-timer frame pacing.
 
 V3.5 adds x86 support for single-file, single-stream LZMA1 `.7z` ROMs. x64 continues to load uncompressed `.nes` ROMs only. The headless regression passed 116 LZMA1 archives in both debug and release paths; 3 unsupported methods were skipped.
 

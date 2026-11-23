@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="90" viewBox="0 0 900 90" role="img" aria-labelledby="title">
+  <title id="title">V1.X minimum-size executable: 4.5 KB (4,565 bytes), x86 Clang + Crinkler</title>
+  <text x="0" y="46" fill="#cf222e" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700">V1.X minimum-size executable: 4.5 KB</text>
+  <text x="2" y="76" fill="#cf222e" font-family="Arial, Helvetica, sans-serif" font-size="18">4,565 bytes · x86 Clang + Crinkler</text>
+</svg>
