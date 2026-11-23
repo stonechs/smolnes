@@ -4,6 +4,7 @@
 
 - 当前基线：smolnes Windows-native V3.5，位于 `dist/V3.5/final/`。
 - V3.5：x86 新增单文件、单数据流 LZMA1 `.7z` ROM 支持；x64 仍只支持 `.nes`。四个 exe 已发布在 GitHub Release [`v3.5`](https://github.com/stonechs/smolnes/releases/tag/v3.5)。
+- 发布提交：`6998e68`；标签 `v3.5` 指向该提交，`main` 和标签均已推送到 `stonechs`。
 - 输出：x86 LLD 16,384 B、x86 Crinkler 8,431 B、x64 LLD 17,920 B、x64 UPX 12,288 B；哈希见 `dist/V3.5/final/release/SHA256SUMS.txt`。
 - 验证：无窗口回归测试在 debug/release 路径各有 116 项通过、3 项不支持格式跳过、0 项失败；未在本次发布中运行 GUI、完整游戏或音频设备测试。
 - 文档：根 README 说明相对上游的 SDL 移除、PPU 渲染调整、DMC 修正和时钟方案。
