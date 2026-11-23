@@ -38,6 +38,23 @@ CMakeSettings.json
 /dist/V2/final-apu-rom-smoke.log
 /dist/V2/final-pig-rom-smoke.log
 
+# V3.5 temporary 7z validation inputs and generated diagnostics
+/dist/V3.5/candidate/results/7z-validation/
+/dist/V3.5/candidate/results/*-preprocessed.c
+/dist/V3.5/candidate/results/*.log
+/dist/V3.5/candidate/build-support/test/inputs/
+/dist/V3.5/candidate/build-support/test/*.exe
+/dist/V3.5/candidate/build-support/test/*.lib
+/dist/V3.5/candidate/build-support/test/*.exp
+/dist/V3.5/candidate/build-support/objects/msvcrt-malloc.lib
+/dist/V3.5/candidate/build-support/objects/msvcrt-malloc.exp
+/dist/V3.5/candidate/build-support/objects/v35-x86-debug-*.obj
+/dist/V3.5/candidate/build-support/objects/v35-x86-release-test-*.obj
+/dist/V3.5/candidate/build-support/objects/v35-x86-msvcrt-*.obj
+/dist/V3.5/candidate/build-support/maps/v35-x86-debug.map
+/dist/V3.5/candidate/build-support/maps/v35-x86-release-test.map
+/dist/V3.5/candidate/build-support/maps/v35-x86-msvcrt.map
+
 # Local scripts, tools and editor workspace
 /scripts/
 /tools/

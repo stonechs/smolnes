@@ -1,6 +1,6 @@
 # 项目状态
 
-更新日期：2026-11-21
+更新日期：2026-11-23
 
 - 当前基线：smolnes Windows-native V3.4，位于 `dist/V3.4/final/`。
 - 输出：x86 LLD、x86 Crinkler、x64 LLD、x64 UPX 共四个 EXE；源码快照、构建脚本、map/object 文件、日志和 SHA-256 清单随包保存。
@@ -44,3 +44,4 @@
 - V3.3 30ms缓冲QPC对照候选（2026-11-21）：以40ms QPC候选为基线，只将队列块数4改为3；继续使用每块10ms、QPC微秒回调诊断和`WHDR_INQUEUE`采样。Clang/LLD x86 PE32构建成功，16,896 B，与40ms候选同大小。用户报告声音异常；19.699秒CSV有1,435次回调，均值13.331ms、中位数4.262ms、P95 39.759ms、最大45.638ms；回填前队列空132次（约9.2%），超过40ms的59次间隔全部伴随空队列，写入错误为0。相同诊断的40ms候选此前37.749秒声音正常且队列未空。实验记录及CSV见`dist/experiments/v3.3-frame-clock-synced-audio-30ms-qpc/`；正式V3.3未改。
 - V3.3 30ms QPC帧消息泵修正候选（2026-11-21）：在帧定时器分支返回前主动泵消息；Clang/LLD x86 PE32构建成功，16,896 B。用户反馈仍有异常；13.731秒CSV记录1,004次回调、平均13.522ms、中位数5.222ms、P95 39.902ms、最大58.868ms；回填前队列空97次（9.7%），超过40ms间隔59次中47次队列为空，错误0。修正没有解决欠载，主线程具体延迟段仍未定位。详情和CSV见`dist/experiments/v3.3-frame-clock-synced-audio-30ms-qpc-drain/`。正式V3.3及此前候选均未改。
 - V3.4 已同步（2026-11-21）：在全整数音频死区修正版上合入60fps音频时钟（1,786,840Hz）、DMC连续模拟周期游标，并设置50ms队列（5×10ms）。四个Clang输出：x86 14,848 B、x86 Crinkler 7,594 B、x64 17,920 B、x64 UPX 12,288 B；PE架构及UPX完整性检查通过，用户已完成运行测试。包位于`dist/V3.4/final/`，提交`f7fb953`和标签`v3.4`已推送至`stonechs/main`，未创建GitHub Release。2026-11-21本地`main`已快进至同一提交，并改为跟踪`stonechs/main`；保留既有工作区改动。
+- V3.5 候选（2026-11-23，未发布）：x86 静态链接给定 LzmaCApi fast 库，支持单文件、单流 LZMA1 的 `.7z` ROM；x64 暂不支持压缩 ROM。release 不执行 7z 布局、边界、展开尺寸或 iNES 合法性检查，只处理解码器返回状态；这些预检仅在定义 `SMOLNES_7Z_DEBUG` 时编入。解码工作区的 `malloc/free` 从 `msvcrt.dll` 导入，生成导入库的 `.def` 位于候选包，保留精简的 `/GS` cookie 检查。x86 ROM/压缩包缓冲上限为 1 MiB + 16 字节。无窗口两路径测试 `D:\2026work\LzmaCApi\forTest`：116 个 LZMA1 压缩包的 debug/release 测试均通过，3 个非 LZMA1 方法跳过。四输出：x86 LLD 16,384 B、x86 Crinkler 8,516 B、x64 LLD 17,920 B、x64 UPX 12,288 B；x86 `.text` 原始数据从 14,336 增至 14,848 B，并新增 `.lzma` 节（原始数据 1,024 B、虚拟大小 547 B）；x86 `.text` 虚拟大小增加约 1 MiB（新增压缩包缓冲）；x64 各节段尺寸与 V3.4 一致。Crinkler PE 不含标准节段表。尚未做 GUI/游戏运行测试，也未发布。候选说明、节段表和测试结果见 `dist/V3.5/candidate/README.md` 和 `results/7z-validation-results.csv`。
