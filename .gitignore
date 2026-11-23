@@ -54,6 +54,8 @@ CMakeSettings.json
 /dist/V3.5/candidate/build-support/maps/v35-x86-debug.map
 /dist/V3.5/candidate/build-support/maps/v35-x86-release-test.map
 /dist/V3.5/candidate/build-support/maps/v35-x86-msvcrt.map
+/dist/V3.5/candidate/build-support/maps/v35-x86-source-lld.map
+/dist/V3.5/candidate/build-support/lzma-source-experiment/
 
 # Local scripts, tools and editor workspace
 /scripts/

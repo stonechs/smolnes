@@ -36,4 +36,18 @@ This candidate adds 7z single-file LZMA1 ROM loading to the x86 build using the 
 
 The x86 `.text` virtual increase mainly comes from the added 1 MiB archive input buffer; it does not add that buffer to the on-disk raw section. The new `.lzma` section contributes 1,024 raw bytes after PE file alignment. Crinkler output has zero entries in the PE section table, so it is compared by total file size only.
 
+## Direct-source link experiment
+
+`build-v3.5-lzma-source-experiment.cmd` compiles `sevenzip_single_fast.c` directly with Clang `-Oz -fno-stack-protector`, assembles `lzma_static_x86.asm` with NASM `-O9`, and links the same app objects as the static-library release. It uses the source files in `D:\2026work\LzmaCApi\SRC` and writes separate experiment outputs.
+
+| Metric | Static `.lib` build | Direct-source build | Change |
+| --- | ---: | ---: | ---: |
+| x86 LLD EXE | 16,384 B | 16,384 B | 0 B |
+| x86 LLD `.text` code in map | `0x2E7F` B | `0x2E28` B | -87 B |
+| x86 LLD `.text` virtual size | 2,293,648 B | 2,293,568 B | -80 B |
+| x86 LLD `.text` raw / `.lzma` raw | 14,848 / 1,024 B | 14,848 / 1,024 B | 0 B |
+| x86 Crinkler EXE | 8,516 B | 8,431 B | -85 B |
+
+The direct build trims some wrapper and stack-cookie code, but the LLD file does not cross a PE file-alignment boundary. The Crinkler gain is modest; the 1 MiB virtual input buffer is unchanged. This experiment only compared builds and did not replace the release outputs or rerun ROM decoding.
+
 These are candidate builds, not a published release.
