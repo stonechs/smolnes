@@ -16,6 +16,6 @@ Updated: 2026-11-23
 
 ## NASM for V3.5 x86 decoder
 
-- NASM 3.01 was used to assemble the vendored `dist/V3.5/candidate/vendor/lzmacapi/SRC/lzma_static_x86.asm` as 32-bit Windows COFF with `-f win32 -O9`.
-- The V3.5 candidate build compiles the repository-root `src/lzmacapi/SRC/sevenzip_single_fast.c` using Clang 23.1.5 with `-Oz`, then links the C and assembly objects into both x86 outputs. The x64 outputs do not include the x86-only decoder. `dist/V3.5/candidate/source/` and `vendor/lzmacapi/` retain the candidate snapshot copy.
-- Build command: `dist/V3.5/candidate/build-v3.5.cmd`. The four outputs built successfully on 2026-11-23. Headless ROM loading regression passed on 116 LZMA1 archives in both debug and release paths; 3 unsupported methods were skipped, with 0 failures. The test exits before emulation, so GUI, gameplay, and audio-device operation were not tested.
+- NASM 3.01 was used to assemble the vendored `dist/V3.5/final/vendor/lzmacapi/SRC/lzma_static_x86.asm` as 32-bit Windows COFF with `-f win32 -O9`.
+- The V3.5 build compiles the repository-root `src/lzmacapi/SRC/sevenzip_single_fast.c` using Clang 23.1.5 with `-Oz`, then links the C and assembly objects into both x86 outputs. The x64 outputs do not include the x86-only decoder. `dist/V3.5/final/source/` and `vendor/lzmacapi/` retain the release snapshot copy.
+- Build command: `dist/V3.5/final/build-v3.5.cmd`. The four outputs built successfully on 2026-11-23. Headless ROM loading regression passed on 116 LZMA1 archives in both debug and release paths; 3 unsupported methods were skipped, with 0 failures. The test exits before emulation, so GUI, gameplay, and audio-device operation were not tested.

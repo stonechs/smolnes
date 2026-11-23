@@ -9,6 +9,6 @@
 - `releases/` contains version-specific release notes and usage guides.
 - The current Windows source is under `../src/`; versioned builds and release artifacts are under `../dist/`.
 
-The current baseline is V3.4, in `../dist/V3.4/final/`. It uses integer audio processing and a 50 ms audio queue.
+The current baseline is V3.5, in `../dist/V3.5/final/`. It adds x86 support for single-file, single-stream LZMA1 `.7z` ROMs; x64 remains `.nes` only.
 
 Historical snapshots under `../archive/` and experiment binaries, captures, and logs under `../dist/experiments/` are local-only and are not included in this repository. Some historical plans and status entries mention those local paths; their summarized findings remain in these documents.

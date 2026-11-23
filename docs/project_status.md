@@ -2,11 +2,11 @@
 
 更新日期：2026-11-23
 
-- 当前基线：smolnes Windows-native V3.4，位于 `dist/V3.4/final/`。
-- 输出：x86 LLD、x86 Crinkler、x64 LLD、x64 UPX 共四个 EXE；源码快照、构建脚本、map/object 文件、日志和 SHA-256 清单随包保存。
-- 修改：音频全整数化；音频时钟按 60 fps 推进；DMC 周期游标连续推进；WinMM 队列为 50 ms（5×10 ms）。
-- 验证：构建成功，PE 架构、哈希和 UPX 完整性已核对；用户已完成运行听测。
-- GitHub：提交 `f7fb953` 和标签 `v3.4` 已推送到 `stonechs/main`；没有创建 GitHub Release。
+- 当前基线：smolnes Windows-native V3.5，位于 `dist/V3.5/final/`。
+- V3.5：x86 新增单文件、单数据流 LZMA1 `.7z` ROM 支持；x64 仍只支持 `.nes`。四个 exe 已发布在 GitHub Release [`v3.5`](https://github.com/stonechs/smolnes/releases/tag/v3.5)。
+- 输出：x86 LLD 16,384 B、x86 Crinkler 8,431 B、x64 LLD 17,920 B、x64 UPX 12,288 B；哈希见 `dist/V3.5/final/release/SHA256SUMS.txt`。
+- 验证：无窗口回归测试在 debug/release 路径各有 116 项通过、3 项不支持格式跳过、0 项失败；未在本次发布中运行 GUI、完整游戏或音频设备测试。
+- 文档：根 README 说明相对上游的 SDL 移除、PPU 渲染调整、DMC 修正和时钟方案。
 - 音频实验（未发布）：在当前 `src/audio_win32.c` 的脉冲波生成中加入 PolyBLEP；与 V3.1 原始源码的 PCM 探针对比，10–23 kHz 高次谐波功率/基波从 0.01349 降到 0.00721（约下降 46.5%）。x86 Crinkler 候选增加 94 B；V3.1 正式文件未改。合成波形探针和 x86/x64 链接通过，未启动 GUI 或对实际 ROM 做听感确认。详见 `docs/audio-polyblep-experiment.md`。
 - 试听候选（未发布）：缓冲队列改为 30 ms，并取消每样本的频率渐变；保留 PolyBLEP。四种架构/压缩输出已构建，PE 架构和 UPX 完整性核验通过。候选位于 `dist/experiments/v3.1-audio-30ms-direct-frequency/`；未启动，等待手动听测。详见对应实验 README 和 `docs/audio-30ms-frequency-step-experiment.md`。
 - 当前试听候选（未发布）：缓冲恢复为 60 ms，频率变化不做 1 ms 渐变，保留 PolyBLEP。四个输出已构建并通过 PE 架构和 UPX 核验；未启动。位于 `dist/experiments/v3.1-audio-60ms-direct-frequency/`，与 30 ms 直切候选作对照。
@@ -44,4 +44,4 @@
 - V3.3 30ms缓冲QPC对照候选（2026-11-21）：以40ms QPC候选为基线，只将队列块数4改为3；继续使用每块10ms、QPC微秒回调诊断和`WHDR_INQUEUE`采样。Clang/LLD x86 PE32构建成功，16,896 B，与40ms候选同大小。用户报告声音异常；19.699秒CSV有1,435次回调，均值13.331ms、中位数4.262ms、P95 39.759ms、最大45.638ms；回填前队列空132次（约9.2%），超过40ms的59次间隔全部伴随空队列，写入错误为0。相同诊断的40ms候选此前37.749秒声音正常且队列未空。实验记录及CSV见`dist/experiments/v3.3-frame-clock-synced-audio-30ms-qpc/`；正式V3.3未改。
 - V3.3 30ms QPC帧消息泵修正候选（2026-11-21）：在帧定时器分支返回前主动泵消息；Clang/LLD x86 PE32构建成功，16,896 B。用户反馈仍有异常；13.731秒CSV记录1,004次回调、平均13.522ms、中位数5.222ms、P95 39.902ms、最大58.868ms；回填前队列空97次（9.7%），超过40ms间隔59次中47次队列为空，错误0。修正没有解决欠载，主线程具体延迟段仍未定位。详情和CSV见`dist/experiments/v3.3-frame-clock-synced-audio-30ms-qpc-drain/`。正式V3.3及此前候选均未改。
 - V3.4 已同步（2026-11-21）：在全整数音频死区修正版上合入60fps音频时钟（1,786,840Hz）、DMC连续模拟周期游标，并设置50ms队列（5×10ms）。四个Clang输出：x86 14,848 B、x86 Crinkler 7,594 B、x64 17,920 B、x64 UPX 12,288 B；PE架构及UPX完整性检查通过，用户已完成运行测试。包位于`dist/V3.4/final/`，提交`f7fb953`和标签`v3.4`已推送至`stonechs/main`，未创建GitHub Release。2026-11-21本地`main`已快进至同一提交，并改为跟踪`stonechs/main`；保留既有工作区改动。
-- V3.5 候选（2026-11-23，未发布）：根目录 `src/` 已更新为 V3.5 源码并作为源码真值，新增 `src/lzmacapi/SRC/` 的 7z LZMA1 C/汇编源码；候选目录保留快照副本。x86 直接编译 C 源码并用 NASM 汇编，Clang 23.1.5 `-Oz`、NASM 3.01 `-f win32 -O9`；构建命令`dist/V3.5/candidate/build-v3.5.cmd`从根`src/`成功生成四个输出，支持单文件、单流 LZMA1 的 `.7z` ROM；x64 暂不支持压缩 ROM。release 不执行 7z 布局、边界、展开尺寸或 iNES 合法性检查，只处理解码器返回状态；这些预检仅在定义 `SMOLNES_7Z_DEBUG` 时编入。解码工作区的 `malloc/free` 从 `msvcrt.dll` 导入。x86 ROM/压缩包缓冲上限为 1 MiB + 16 字节。当前源码直编构建的无窗口回归测试：116 个 LZMA1 压缩包在 debug/release 路径均通过，3 个不支持的方法跳过，失败0项；测试加载解码后退出，未验证 GUI、游戏运行或音频设备输出。四输出：x86 LLD 16,384 B、x86 Crinkler 8,431 B、x64 LLD 17,920 B、x64 UPX 12,288 B；x86 `.text` 为虚拟2,293,568 B/原始14,848 B，相比V3.4虚拟+1,049,096 B、原始+512 B；新增`.lzma`节虚拟547 B/原始1,024 B。map中`_run_emulator`增加152 B，C解码入口和`read_number_fast`约221/87 B，汇编`.lzma`为547 B。此前提及871 B来自独立LzmaCApi map，87 B则是源码直编相对静态库链接的代码段缩小量，口径不同。Crinkler PE不含标准节段表。候选说明、SHA-256和map见`dist/V3.5/candidate/README.md`及候选目录。
+- V3.5 正式版（2026-11-23）：构建脚本从根 `src/` 编译；x86 通过 Clang `-Oz` 和 NASM 直编 LZMA1 解码器，支持单文件/单流 `.7z`，x64 仅支持 `.nes`。发行路径不执行 archive/iNES 结构与尺寸预检（仅 debug 宏启用）。无窗口回归各 116 PASS、3 SKIP、0 FAIL；四个输出大小与 SHA-256 见 `dist/V3.5/final/README.md` 和清单。未在此回归中测试 GUI、游戏运行或音频设备。

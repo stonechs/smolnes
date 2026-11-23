@@ -1,6 +1,6 @@
-# smolnes V3.5 candidate
+# smolnes Windows-native V3.5
 
-This candidate adds 7z single-file LZMA1 ROM loading to the x86 build by compiling `src/lzmacapi/SRC/sevenzip_single_fast.c` with Clang and assembling `src/lzmacapi/SRC/lzma_static_x86.asm` with NASM. The repository-root `src/` is the source of truth; the candidate's `source/` and `vendor/lzmacapi/` directories mirror the V3.5 source snapshot and its attribution. The x64 build remains NES-only because this decoder is x86-only.
+V3.5 adds 7z single-file LZMA1 ROM loading to the x86 build by compiling `src/lzmacapi/SRC/sevenzip_single_fast.c` with Clang and assembling `src/lzmacapi/SRC/lzma_static_x86.asm` with NASM. The repository-root `src/` is the source of truth; this package's `source/` and `vendor/lzmacapi/` directories mirror the V3.5 source snapshot and its attribution. The x64 build remains NES-only because this decoder is x86-only.
 
 ## Runtime behavior
 
@@ -53,4 +53,4 @@ The map's initial `.text` contribution is 0x2C73 B in V3.4 and 0x2E28 B in this 
 
 The PE file grows by 1,536 B because `.text` raw data increases by one 512-byte file-alignment unit and the new `.lzma` section occupies 1,024 raw bytes. The `.text` virtual increase also includes the 1 MiB archive buffer. Crinkler has no standard PE section table, so its output is compared by total file size.
 
-These are candidate builds, not a published release.
+These are the V3.5 release builds. No ROM files are included.
