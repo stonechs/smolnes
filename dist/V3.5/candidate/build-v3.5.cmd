@@ -2,11 +2,11 @@
 setlocal
 for %%I in ("%~dp0..\..\..") do set "ROOT=%%~fI"
 set "DIST=%~dp0"
-set "SRC=%DIST%source"
+set "SRC=%ROOT%\src"
 set "OBJ=%DIST%build-support\objects"
 set "MAP=%DIST%build-support\maps"
 set "REL=%DIST%release"
-set "LZMA_LIB=%DIST%vendor\lzmacapi\lzmacapi_x86_fast.lib"
+set "LZMA_SRC=%ROOT%\src\lzmacapi\SRC"
 set "MALLOC_DEF=%DIST%build-support\msvcrt-malloc.def"
 set "MALLOC_LIB=%OBJ%\msvcrt-malloc.lib"
 set "CLANG=C:\Users\maco\AppData\Local\Programs\LLVM\bin\clang.exe"
@@ -14,6 +14,7 @@ set "LLD=C:\Users\maco\AppData\Local\Programs\LLVM\bin\lld-link.exe"
 set "LIBTOOL=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x86\lib.exe"
 set "CRINKLER=%ROOT%\tools\crinkler\crinkler30b\Win32\Crinkler.exe"
 set "UPXBIN=%ROOT%\tools\upx.exe"
+set "NASM=C:\Users\maco\AppData\Local\Microsoft\WinGet\Packages\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\mingw64\bin\nasm.exe"
 if exist "%REL%\smolnes-v3.5-clang-x86.exe" del /q "%REL%\smolnes-v3.5-clang-x86.exe"
 if exist "%REL%\smolnes-v3.5-clang-x86-crinkler.exe" del /q "%REL%\smolnes-v3.5-clang-x86-crinkler.exe"
 if exist "%REL%\smolnes-v3.5-clang-x64.exe" del /q "%REL%\smolnes-v3.5-clang-x64.exe"
@@ -30,9 +31,13 @@ if errorlevel 1 exit /b 1
 if errorlevel 1 exit /b 1
 "%CLANG%" %FLAGS% -c "%SRC%\audio_win32.c" -o "%OBJ%\v35-x86-audio.obj"
 if errorlevel 1 exit /b 1
-"%LLD%" /nologo /NODEFAULTLIB /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup /OPT:REF /OPT:ICF /INCREMENTAL:NO /DYNAMICBASE:NO /FIXED /MACHINE:X86 /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.idata=.text /SECTION:.text,ERW /MAP:"%MAP%\v35-x86-lld.map" /OUT:"%REL%\smolnes-v3.5-clang-x86.exe" "%OBJ%\v35-x86-main.obj" "%OBJ%\v35-x86-apu.obj" "%OBJ%\v35-x86-audio.obj" "%LZMA_LIB%" "%MALLOC_LIB%" kernel32.lib user32.lib gdi32.lib comdlg32.lib winmm.lib libcmt.lib
+"%CLANG%" %FLAGS% -I"%LZMA_SRC%" -c "%LZMA_SRC%\sevenzip_single_fast.c" -o "%OBJ%\v35-x86-sevenzip.obj"
 if errorlevel 1 exit /b 1
-"%CRINKLER%" /NODEFAULTLIB /ENTRY:mainCRTStartup /SUBSYSTEM:WINDOWS /COMPMODE:FAST /HASHSIZE:32 /HASHTRIES:100 /TRANSFORM:CALLS /OUT:"%REL%\smolnes-v3.5-clang-x86-crinkler.exe" "%OBJ%\v35-x86-main.obj" "%OBJ%\v35-x86-apu.obj" "%OBJ%\v35-x86-audio.obj" "%LZMA_LIB%" "%MALLOC_LIB%" kernel32.lib user32.lib gdi32.lib comdlg32.lib winmm.lib libcmt.lib
+"%NASM%" -f win32 -O9 "%LZMA_SRC%\lzma_static_x86.asm" -o "%OBJ%\v35-x86-lzma.obj"
+if errorlevel 1 exit /b 1
+"%LLD%" /nologo /NODEFAULTLIB /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup /OPT:REF /OPT:ICF /INCREMENTAL:NO /DYNAMICBASE:NO /FIXED /MACHINE:X86 /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.idata=.text /SECTION:.text,ERW /MAP:"%MAP%\v35-x86-lld.map" /OUT:"%REL%\smolnes-v3.5-clang-x86.exe" "%OBJ%\v35-x86-main.obj" "%OBJ%\v35-x86-apu.obj" "%OBJ%\v35-x86-audio.obj" "%OBJ%\v35-x86-sevenzip.obj" "%OBJ%\v35-x86-lzma.obj" "%MALLOC_LIB%" kernel32.lib user32.lib gdi32.lib comdlg32.lib winmm.lib libcmt.lib
+if errorlevel 1 exit /b 1
+"%CRINKLER%" /NODEFAULTLIB /ENTRY:mainCRTStartup /SUBSYSTEM:WINDOWS /COMPMODE:FAST /HASHSIZE:32 /HASHTRIES:100 /TRANSFORM:CALLS /OUT:"%REL%\smolnes-v3.5-clang-x86-crinkler.exe" "%OBJ%\v35-x86-main.obj" "%OBJ%\v35-x86-apu.obj" "%OBJ%\v35-x86-audio.obj" "%OBJ%\v35-x86-sevenzip.obj" "%OBJ%\v35-x86-lzma.obj" "%MALLOC_LIB%" kernel32.lib user32.lib gdi32.lib comdlg32.lib winmm.lib libcmt.lib
 if errorlevel 1 exit /b 1
 
 call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64 -host_arch=x64 >nul

@@ -3,8 +3,19 @@
 #include <stdlib.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <commdlg.h>
+#include <mmsystem.h>
 #include "apu.h"
 #include "audio_win32.h"
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+#include "lzmacapi/SRC/sevenzip_single.h"
+#endif
+
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+#define ROM_BUFFER_SIZE (1024 * 1024 + 16)
+#else
+#define ROM_BUFFER_SIZE 1024 * 1024
+#endif
 
 #define PULL mem(++S, 1, 0, 0)
 #define PUSH(x) mem(S--, 1, x, 1)
@@ -43,14 +54,41 @@ uint8_t *rom, *chrrom,                // Points to the start of PRG/CHR ROM
     mmc3_chrprg[8], mmc3_bits,         // Mapper 4 (MMC3) registers
     mmc3_irq, mmc3_latch,              //
     chrbank0, chrbank1, prgbank,       // Current PRG/CHR bank
-    rombuf[1024 * 1024];                // Buffer to read ROM file into
+    rombuf[ROM_BUFFER_SIZE];             // Buffer to read/decompress ROM into
+
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+static uint8_t *rom_header;
+static uint8_t rom_archive[ROM_BUFFER_SIZE];
+
+/* The supplied x86 decoder object was built with /GS. Retain the cookie check
+   without linking the CRT's much larger failure-reporting machinery. */
+uintptr_t __security_cookie = 0xBB40E64E;
+void __fastcall __security_check_cookie(uintptr_t cookie) {
+  if (cookie != __security_cookie)
+    ExitProcess(ERROR_INVALID_DATA);
+}
+#else
+#define rom_header rombuf
+#endif
 
 static HWND main_window;
 static int app_running = 1;
-static HANDLE frame_timer;
+static HANDLE frame_timer_16, frame_timer_50;
+static unsigned frame_wait_count;
+#ifdef SMOLNES_HEADLESS_TRACE
+static unsigned headless_frame;
+static FILE *headless_pcm_log;
+static FILE *headless_mix_pcm;
+static FILE *headless_dmc_pcm;
+static FILE *headless_apu_time_log;
+static uint64_t headless_audio_last_apu_cycle;
+static uint64_t headless_audio_cycle_remainder;
+static long long headless_frame_audio_energy;
+static unsigned headless_frame_audio_peak;
+#endif
+#if defined(SMOLNES_FRAME_TIME_DIAGNOSTICS) || defined(SMOLNES_PACING_STRESS_TEST)
 static LARGE_INTEGER frame_frequency;
-static LARGE_INTEGER next_frame_deadline;
-static LONGLONG frame_tick_remainder;
+#endif
 
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
 static FILE *frame_timing_log;
@@ -114,8 +152,14 @@ uint16_t scany,          // Scanline Y
 int shift_at = 0;
 
 static int key_is_down(int virtual_key) {
+#ifdef SMOLNES_HEADLESS_TRACE
+  return virtual_key == VK_RETURN &&
+         ((headless_frame >= 120 && headless_frame < 122) ||
+          (headless_frame >= 180 && headless_frame < 182));
+#else
   return GetForegroundWindow() == main_window &&
          (GetAsyncKeyState(virtual_key) & 0x8000) != 0;
+#endif
 }
 
 // Prepare the current scanline's sprite list once, instead of searching all
@@ -188,6 +232,9 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam,
     app_running = 0;
     PostQuitMessage(0);
     return 0;
+  case MM_WOM_DONE:
+    audio_handle_done((void *)lparam);
+    return 0;
   case WM_PAINT: {
     PAINTSTRUCT paint;
     HDC dc = BeginPaint(hwnd, &paint);
@@ -237,72 +284,121 @@ static int pump_native_messages(void) {
   return app_running;
 }
 
-static void advance_frame_deadline(void) {
-  next_frame_deadline.QuadPart += frame_frequency.QuadPart / 60;
-  frame_tick_remainder += frame_frequency.QuadPart % 60;
-  if (frame_tick_remainder >= 60) {
-    next_frame_deadline.QuadPart++;
-    frame_tick_remainder -= 60;
-  }
-}
+#ifndef SMOLNES_OMIT_TIMER_FAILURE_CHECKS
+#define SMOLNES_TIMER_CHECK(expression) \
+  do {                                      \
+    if (!(expression))                     \
+      goto timer_setup_failed;             \
+  } while (0)
+#else
+#define SMOLNES_TIMER_CHECK(expression) ((void)(expression))
+#endif
 
-static int initialize_frame_timer(void) {
+static int initialize_frame_timers(void) {
+#if defined(SMOLNES_FRAME_TIME_DIAGNOSTICS) || defined(SMOLNES_PACING_STRESS_TEST)
   if (!QueryPerformanceFrequency(&frame_frequency))
     return 0;
-
-  frame_timer = CreateWaitableTimerExA(NULL, NULL,
-                                       CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
-                                       TIMER_ALL_ACCESS);
-  if (!frame_timer)
-    frame_timer = CreateWaitableTimerA(NULL, FALSE, NULL);
-  if (!frame_timer || !QueryPerformanceCounter(&next_frame_deadline)) {
-    if (frame_timer) {
-      CloseHandle(frame_timer);
-      frame_timer = NULL;
-    }
-    return 0;
-  }
-  frame_tick_remainder = 0;
+#endif
+  LARGE_INTEGER first_16ms, first_50ms;
+  first_16ms.QuadPart = -160000;
+  first_50ms.QuadPart = -500000;
+  frame_timer_16 = CreateWaitableTimerA(NULL, FALSE, NULL);
+  SMOLNES_TIMER_CHECK(frame_timer_16 != NULL);
+  frame_timer_50 = CreateWaitableTimerA(NULL, FALSE, NULL);
+  SMOLNES_TIMER_CHECK(frame_timer_50 != NULL);
+  SMOLNES_TIMER_CHECK(
+      SetWaitableTimer(frame_timer_16, &first_16ms, 16, NULL, NULL, FALSE));
+  SMOLNES_TIMER_CHECK(
+      SetWaitableTimer(frame_timer_50, &first_50ms, 50, NULL, NULL, FALSE));
   return 1;
+#ifndef SMOLNES_OMIT_TIMER_FAILURE_CHECKS
+timer_setup_failed:
+  if (frame_timer_16) {
+    CancelWaitableTimer(frame_timer_16);
+    CloseHandle(frame_timer_16);
+    frame_timer_16 = NULL;
+  }
+  if (frame_timer_50) {
+    CancelWaitableTimer(frame_timer_50);
+    CloseHandle(frame_timer_50);
+    frame_timer_50 = NULL;
+  }
+  return 0;
+#endif
 }
 
-// Pace completed frames to 60 Hz. Deadlines stay anchored to QPC time, and
-// missed ticks are skipped instead of being queued for catch-up frames.
+#undef SMOLNES_TIMER_CHECK
+// Pace two frames at 16 ms, then synchronize the third to the 50 ms timer.
 static int wait_for_next_frame(void) {
-  LARGE_INTEGER now;
-  LARGE_INTEGER due_time;
-
-  if (!QueryPerformanceCounter(&now))
-    return 0;
-
-  advance_frame_deadline();
-  if (next_frame_deadline.QuadPart <= now.QuadPart) {
-    // The frame missed its deadline. Skip elapsed ticks and immediately
-    // continue; waiting for a later tick here would unnecessarily halve the
-    // frame rate whenever rendering ran just over budget.
-    do {
-      advance_frame_deadline();
-      if (!QueryPerformanceCounter(&now))
-        return 0;
-    } while (next_frame_deadline.QuadPart <= now.QuadPart);
-    return app_running;
+#ifdef SMOLNES_HEADLESS_TRACE
+  uint64_t apu_cycle = apu_diagnostic_time();
+  if (apu_cycle >= headless_audio_last_apu_cycle)
+    headless_audio_cycle_remainder +=
+        (apu_cycle - headless_audio_last_apu_cycle) * 48000u;
+  headless_audio_last_apu_cycle = apu_cycle;
+  while (headless_audio_cycle_remainder >= 1786840u * 480u) {
+    short pcm[480 * 2];
+    short dmc_pcm[480 * 2];
+    long long energy = 0;
+    int peak = 0;
+    unsigned i;
+    audio_test_render_with_dmc(pcm, dmc_pcm, 480);
+    if (headless_mix_pcm)
+      fwrite(pcm, sizeof(pcm[0]), 960, headless_mix_pcm);
+    if (headless_dmc_pcm)
+      fwrite(dmc_pcm, sizeof(dmc_pcm[0]), 960, headless_dmc_pcm);
+    for (i = 0; i < 960; i++) {
+      int value = pcm[i];
+      int magnitude = value < 0 ? -value : value;
+      if (magnitude > peak) peak = magnitude;
+      energy += (long long)value * value;
+    }
+    if ((unsigned)peak > headless_frame_audio_peak)
+      headless_frame_audio_peak = (unsigned)peak;
+    headless_frame_audio_energy += energy;
+    headless_audio_cycle_remainder -= 1786840u * 480u;
   }
+  if (!headless_apu_time_log) {
+    headless_apu_time_log = fopen("headless-apu-time.csv", "w");
+    if (headless_apu_time_log)
+      fputs("frame,apu_cycle\n", headless_apu_time_log);
+  }
+  if (headless_apu_time_log)
+    fprintf(headless_apu_time_log, "%u,%llu\n", headless_frame,
+            (unsigned long long)apu_cycle);
+  headless_frame++;
+  if (headless_pcm_log && (headless_frame % 30 == 0)) {
+    fprintf(headless_pcm_log, "%u,%u,%lld,%d\n", headless_frame,
+            headless_frame_audio_peak, headless_frame_audio_energy,
+            audio_test_dmc_peak());
+    fflush(headless_pcm_log);
+    headless_frame_audio_peak = 0;
+    headless_frame_audio_energy = 0;
+  }
+  return headless_frame < 1200;
+#else
+  LARGE_INTEGER first_16ms;
+  HANDLE timer;
+  DWORD result;
 
-  LONGLONG ticks_to_wait = next_frame_deadline.QuadPart - now.QuadPart;
-  LONGLONG wait_100ns =
-      (ticks_to_wait * 10000000LL + frame_frequency.QuadPart - 1) /
-      frame_frequency.QuadPart;
-  if (wait_100ns < 1)
-    wait_100ns = 1;
-  due_time.QuadPart = -wait_100ns;
-  if (!SetWaitableTimer(frame_timer, &due_time, 0, NULL, NULL, FALSE))
-    return 0;
-
+  if (++frame_wait_count == 3) {
+    frame_wait_count = 0;
+    timer = frame_timer_50;
+  } else {
+    timer = frame_timer_16;
+  }
   for (;;) {
-    DWORD result = MsgWaitForMultipleObjects(1, &frame_timer, FALSE, INFINITE,
-                                             QS_ALLINPUT);
-    if (result == WAIT_OBJECT_0)
+    result = MsgWaitForMultipleObjects(1, &timer, FALSE, INFINITE, QS_ALLINPUT);
+    if (result == WAIT_OBJECT_0) {
+      if (frame_wait_count == 0) {
+        // Re-anchor the 16 ms cadence at each 50 ms boundary.
+        first_16ms.QuadPart = -160000;
+        if (!SetWaitableTimer(frame_timer_16, &first_16ms, 16,
+                              NULL, NULL, FALSE))
+          return 0;
+      }
       return app_running;
+    }
     if (result == WAIT_OBJECT_0 + 1) {
       if (!pump_native_messages())
         return 0;
@@ -310,8 +406,8 @@ static int wait_for_next_frame(void) {
     }
     return 0;
   }
+#endif
 }
-
 // Read a byte from CHR ROM or CHR RAM.
 uint8_t *get_chr_byte(uint16_t a) {
   return &chrrom[chr[a >> chrbits] << chrbits | a % (1 << chrbits)];
@@ -433,7 +529,7 @@ uint8_t mem(uint8_t lo, uint8_t hi, uint8_t val, uint8_t write) {
   default: // $8000...$ffff ROM
     // handle mapper writes
     if (write)
-      switch (rombuf[6] >> 4) {
+      switch (rom_header[6] >> 4) {
       case 7: // mapper 7
         mirror = !(val / 16);
         prg[0] = val % 8 * 2;
@@ -453,7 +549,7 @@ uint8_t mem(uint8_t lo, uint8_t hi, uint8_t val, uint8_t write) {
             tmp = mmc3_bits >> 5 & 2;
             prg[0 + tmp] = mmc3_chrprg[6];
             prg[1] = mmc3_chrprg[7];
-            prg[3] = rombuf[4] * 2 - 1;
+            prg[3] = rom_header[4] * 2 - 1;
             prg[2 - tmp] = prg[3] - 1;
             break;
           case 5: // Mirroring
@@ -502,15 +598,19 @@ uint8_t mem(uint8_t lo, uint8_t hi, uint8_t val, uint8_t write) {
           // Update PRG banks.
           tmp = mmc1_ctrl / 4 % 4 - 2;
           prg[0] = !tmp ? 0 : tmp == 1 ? prgbank : prgbank & ~1;
-          prg[1] = !tmp ? prgbank : tmp == 1 ? rombuf[4] - 1 : prgbank | 1;
+          prg[1] = !tmp ? prgbank : tmp == 1 ? rom_header[4] - 1 : prgbank | 1;
         }
       }
-    return rom[(prg[hi - 8 >> prgbits - 12] & (rombuf[4] << 14 - prgbits) - 1)
+    return rom[(prg[hi - 8 >> prgbits - 12] & (rom_header[4] << 14 - prgbits) - 1)
                    << prgbits |
                addr & (1 << prgbits) - 1];
   }
 
   return ~0;
+}
+
+static uint8_t apu_read_dmc_memory(uint16_t address) {
+  return mem((uint8_t)address, (uint8_t)(address >> 8), 0, 0);
 }
 
 // Read a byte at address `pc_hi:PCL` and increment PC.
@@ -523,90 +623,323 @@ uint8_t read_pc() {
 // Set N (negative) and Z (zero) flags of `P` register, based on `val`.
 uint8_t set_nz(uint8_t val) { return P = P & 125 | val & 128 | !val * 2; }
 
-static char rom_argument[32768];
+static char rom_path[MAX_PATH];
+static OPENFILENAMEA rom_dialog;
 
-static char *parse_rom_argument(LPSTR command_line) {
-  while (*command_line == ' ' || *command_line == '\t')
-    command_line++;
-  int quoted = *command_line == '"';
-  if (quoted)
-    command_line++;
-  size_t length = 0;
-  while (*command_line &&
-         (quoted ? *command_line != '"'
-                 : *command_line != ' ' && *command_line != '\t')) {
-    if (length + 1 >= sizeof rom_argument)
-      return NULL;
-    rom_argument[length++] = *command_line++;
+static char *select_rom_file(void) {
+  char *p = GetCommandLineA();
+  if (*p == '"') {
+    ++p;
+    while (*p && *p != '"') ++p;
+    if (*p) ++p;
+  } else {
+    while (*p && *p != ' ') ++p;
   }
-  if (!length || (quoted && *command_line != '"'))
-    return NULL;
-  rom_argument[length] = 0;
-  return rom_argument;
+  while (*p == ' ') ++p;
+  if (*p)
+    return p;
+  rom_dialog.lStructSize = sizeof rom_dialog;
+  rom_dialog.lpstrFile = rom_path;
+  rom_dialog.nMaxFile = sizeof rom_path;
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+  rom_dialog.lpstrFilter =
+      "NES ROMs (*.nes;*.7z)\0*.nes;*.7z\0All files (*.*)\0*.*\0\0";
+#else
+  rom_dialog.lpstrFilter =
+      "NES ROMs (*.nes)\0*.nes\0All files (*.*)\0*.*\0\0";
+#endif
+  rom_dialog.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
+  return GetOpenFileNameA(&rom_dialog) ? rom_path : NULL;
 }
 
-static int run_emulator(const char *rom_path) {
-  if (!rom_path) {
-    MessageBoxA(NULL, "Usage: smolnes-win32 <rom.nes>", "smolnes",
-                MB_OK | MB_ICONERROR);
-    return 1;
+#if defined(SMOLNES_ENABLE_7Z_LZMA1) && defined(SMOLNES_7Z_DEBUG)
+/* Read the same 7z integer subset as the fast library, while proving that its
+   four-byte speculative reads and the consumed value stay inside the header. */
+static int read_7z_number_checked(const uint8_t *archive, size_t archive_size,
+                                 size_t header_end, size_t *position,
+                                 uint32_t *value) {
+  uint32_t first, raw;
+  unsigned length;
+  if (*position > archive_size || archive_size - *position < 4 ||
+      *position > header_end)
+    return 0;
+  raw = (uint32_t)archive[*position] |
+        (uint32_t)archive[*position + 1] << 8 |
+        (uint32_t)archive[*position + 2] << 16 |
+        (uint32_t)archive[*position + 3] << 24;
+  first = raw & 0xffu;
+  if (!(first & 0x80u)) {
+    length = 1;
+    *value = first;
+  } else if (!(first & 0x40u)) {
+    length = 2;
+    *value = ((raw >> 8) & 0xffu) | ((first & 0x3fu) << 8);
+  } else if (!(first & 0x20u)) {
+    length = 3;
+    *value = ((raw >> 8) & 0xffffu) | ((first & 0x1fu) << 16);
+  } else {
+    length = 4;
+    *value = ((raw >> 8) & 0xffffffu) | ((first & 0x0fu) << 24);
   }
+  if (length > header_end - *position)
+    return 0;
+  *position += length;
+  return 1;
+}
+
+/* Preflight exactly the single-folder LZMA1 layout accepted by the library.
+   The release .lib trusts its caller and does not enforce output_capacity. */
+static int inspect_single_lzma1_7z(const uint8_t *archive,
+                                   size_t archive_size,
+                                   size_t *unpacked_size) {
+  static const uint8_t signature[6] = {0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c};
+  uint64_t next_offset, next_size;
+  size_t header_start, header_end, position, packed_offset;
+  uint32_t number, packed_size, folder_count, coder_count;
+  uint8_t tag, all_digests;
+
+  if (archive_size < 32 || archive_size >= 100u * 1024u * 1024u ||
+      archive[0] != signature[0] || archive[1] != signature[1] ||
+      archive[2] != signature[2] || archive[3] != signature[3] ||
+      archive[4] != signature[4] || archive[5] != signature[5])
+    return 0;
+  next_offset = (uint64_t)archive[12] | (uint64_t)archive[13] << 8 |
+                (uint64_t)archive[14] << 16 | (uint64_t)archive[15] << 24 |
+                (uint64_t)archive[16] << 32 | (uint64_t)archive[17] << 40 |
+                (uint64_t)archive[18] << 48 | (uint64_t)archive[19] << 56;
+  next_size = (uint64_t)archive[20] | (uint64_t)archive[21] << 8 |
+              (uint64_t)archive[22] << 16 | (uint64_t)archive[23] << 24 |
+              (uint64_t)archive[24] << 32 | (uint64_t)archive[25] << 40 |
+              (uint64_t)archive[26] << 48 | (uint64_t)archive[27] << 56;
+  if (next_offset > archive_size - 32)
+    return 0;
+  header_start = 32 + (size_t)next_offset;
+  if (next_size > archive_size - header_start)
+    return 0;
+  header_end = header_start + (size_t)next_size;
+  position = header_start;
+
+  /* Header -> MainStreamsInfo -> PackInfo; one stream with a packed size. */
+  if (header_end - position < 3 || archive[position++] != 0x01 ||
+      archive[position++] != 0x04 || archive[position++] != 0x06 ||
+      !read_7z_number_checked(archive, archive_size, header_end, &position,
+                              &number) ||
+      number >= 100u * 1024u * 1024u || header_end - position < 2 ||
+      archive[position++] != 1 || archive[position++] != 9 ||
+      !read_7z_number_checked(archive, archive_size, header_end, &position,
+                              &packed_size))
+    return 0;
+  if (position >= header_end)
+    return 0;
+  tag = archive[position++];
+  if (tag == 10) {
+    if (position >= header_end)
+      return 0;
+    all_digests = archive[position++];
+    if (all_digests) {
+      if (header_end - position < 4)
+        return 0;
+      position += 4;
+    } else {
+      if (position >= header_end)
+        return 0;
+      if (archive[position++] & 0x80u) {
+        if (header_end - position < 4)
+          return 0;
+        position += 4;
+      }
+    }
+    if (position >= header_end || archive[position++] != 0)
+      return 0;
+  } else if (tag != 0) {
+    return 0;
+  }
+  packed_offset = 32 + (size_t)number;
+  if (!packed_size || packed_offset > header_start ||
+      packed_size > header_start - packed_offset)
+    return 0;
+
+  /* The remaining fixed fields must match the fast decoder's assumptions. */
+  if (header_end - position < 2 || archive[position++] != 7 ||
+      archive[position++] != 0x0b ||
+      !read_7z_number_checked(archive, archive_size, header_end, &position,
+                              &folder_count) ||
+      folder_count != 1 || position >= header_end || archive[position++] != 0 ||
+      !read_7z_number_checked(archive, archive_size, header_end, &position,
+                              &coder_count) ||
+      coder_count != 1 || header_end - position < 9 ||
+      archive[position++] != 0x23 || archive[position++] != 0x03 ||
+      archive[position++] != 0x01 || archive[position++] != 0x01 ||
+      archive[position++] != 5)
+    return 0;
+  if (header_end - position < 6 || archive[position] >= 225)
+    return 0;
+  position += 5;
+  if (archive[position++] != 0x0c ||
+      !read_7z_number_checked(archive, archive_size, header_end, &position,
+                              &number) ||
+      number < 16 || number > ROM_BUFFER_SIZE)
+    return 0;
+  *unpacked_size = number;
+  return 1;
+}
+#endif
+
+static int run_emulator(const char *rom_path) {
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+  int rom_is_7z = 0;
+#endif
   HANDLE rom_file = CreateFileA(rom_path, GENERIC_READ, FILE_SHARE_READ, NULL,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (rom_file == INVALID_HANDLE_VALUE) {
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+    return 1;
+#else
     MessageBoxA(NULL, rom_path, "Could not open ROM",
                 MB_OK | MB_ICONERROR);
     return 1;
+#endif
   }
   DWORD rom_bytes = 0;
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+  uint8_t *rom_input = rom_archive;
+  BOOL rom_read_ok = ReadFile(rom_file, rom_input, (DWORD)ROM_BUFFER_SIZE,
+                              &rom_bytes, NULL);
+#else
   BOOL rom_read_ok = ReadFile(rom_file, rombuf, (DWORD)sizeof rombuf,
                               &rom_bytes, NULL);
+#endif
   BOOL rom_close_ok = CloseHandle(rom_file);
   if (!rom_read_ok || !rom_close_ok) {
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+    return 2;
+#else
     MessageBoxA(NULL, rom_path, "Could not read ROM", MB_OK | MB_ICONERROR);
     return 1;
+#endif
   }
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+  if (rom_bytes >= 6 && rom_input[0] == 0x37 && rom_input[1] == 0x7a &&
+      rom_input[2] == 0xbc && rom_input[3] == 0xaf && rom_input[4] == 0x27 &&
+      rom_input[5] == 0x1c) {
+    rom_is_7z = 1;
+    size_t decoded_size = 0;
+    SevenZipResult decode_result;
+#ifdef SMOLNES_7Z_DEBUG
+    size_t expected_size = 0;
+    if (!inspect_single_lzma1_7z(rom_archive, rom_bytes, &expected_size)) {
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+      return 3;
+#else
+      MessageBoxA(NULL, "This 7z file is not a supported single-file LZMA1 ROM",
+                  "Could not load ROM", MB_OK | MB_ICONERROR);
+      return 1;
+#endif
+    }
+#endif
+    decode_result = sevenzip_extract_single_lzma1_fast(
+        rom_archive, rom_bytes, rombuf, sizeof rombuf, &decoded_size);
+    if (decode_result != SEVENZIP_OK) {
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+      return 4;
+#else
+      MessageBoxA(NULL, "Could not decode a valid NES ROM from this 7z file",
+                  "Could not load ROM", MB_OK | MB_ICONERROR);
+      return 1;
+#endif
+    }
+#ifdef SMOLNES_7Z_DEBUG
+    if (decoded_size != expected_size || rombuf[0] != 'N' ||
+        rombuf[1] != 'E' || rombuf[2] != 'S' || rombuf[3] != 0x1a) {
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+      return 5;
+#else
+      MessageBoxA(NULL, "Decoded data does not contain a valid NES ROM",
+                  "Could not load ROM", MB_OK | MB_ICONERROR);
+      return 1;
+#endif
+    }
+#endif
+    rom_bytes = (DWORD)decoded_size;
+    rom_header = rombuf;
+  } else {
+    rom_header = rom_input;
+  }
+#endif
+#ifdef SMOLNES_ENABLE_7Z_LZMA1
+  if (rom_bytes < 16 && !rom_is_7z) {
+#else
   if (rom_bytes < 16) {
+#endif
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+    return 6;
+#else
     MessageBoxA(NULL, rom_path, "ROM is too small to contain an iNES header",
                 MB_OK | MB_ICONERROR);
     return 1;
+#endif
   }
   // Start PRG0 after 16-byte header.
-  rom = rombuf + 16;
-  // PRG1 is the last bank. `rombuf[4]` is the number of 16k PRG banks.
-  prg[1] = rombuf[4] - 1;
-  // CHR0 ROM is after all PRG data in the file. `rombuf[5]` is the number of
+  rom = rom_header + 16;
+  // PRG1 is the last bank. `rom_header[4]` is the number of 16k PRG banks.
+  prg[1] = rom_header[4] - 1;
+  // CHR0 ROM is after all PRG data in the file. `rom_header[5]` is the number of
   // 8k CHR banks. If it is zero, assume the game uses CHR RAM.
-  chrrom = rombuf[5] ? rom + (rombuf[4] << 14) : chrram;
+  chrrom = rom_header[5] ? rom + (rom_header[4] << 14) : chrram;
   // CHR1 is the last 4k bank.
-  chr[1] = rombuf[5] ? rombuf[5] * 2 - 1 : 1;
-  // Bit 0 of `rombuf[6]` is 0=>horizontal mirroring, 1=>vertical mirroring.
-  mirror = 3 - rombuf[6] % 2;
-  if (rombuf[6] / 16 == 4) {
+  chr[1] = rom_header[5] ? rom_header[5] * 2 - 1 : 1;
+  // Bit 0 of `rom_header[6]` is 0=>horizontal mirroring, 1=>vertical mirroring.
+  mirror = 3 - rom_header[6] % 2;
+  if (rom_header[6] / 16 == 4) {
     mem(0, 128, 0, 1); // Update to default mmc3 banks
     prgbits--;         // 8kb PRG banks
     chrbits -= 2;      // 1kb CHR banks
   }
 
+#ifdef SMOLNES_7Z_VALIDATE_ONLY
+  return 0;
+#endif
+
   // Start at address in reset vector, at $FFFC.
   PCL = mem(~3, ~0, 0, 0);
   pc_hi = mem(~2, ~0, 0, 0);
 
+#ifndef SMOLNES_HEADLESS_TRACE
   if (!create_native_window()) {
     MessageBoxA(NULL, "Could not create the emulator window", "smolnes",
                 MB_OK | MB_ICONERROR);
     return 1;
   }
-  if (!initialize_frame_timer()) {
-    MessageBoxA(NULL, "Could not initialize the frame timer", "smolnes",
+  if (!initialize_frame_timers()) {
+    MessageBoxA(NULL, "Could not initialize the frame timers", "smolnes",
                 MB_OK | MB_ICONERROR);
     DestroyWindow(main_window);
     return 1;
   }
-  if (!audio_start())
+#else
+  audio_test_reset();
+  {
+    short prefill[480 * 2];
+    unsigned i;
+    for (i = 0; i < 6; i++) audio_test_render(prefill, 480);
+  }
+  headless_pcm_log = fopen("headless-pcm.csv", "w");
+  headless_mix_pcm = fopen("headless-mix.pcm", "wb");
+  headless_dmc_pcm = fopen("headless-dmc.pcm", "wb");
+  if (headless_pcm_log)
+    fputs("frame,peak,energy,dmc_peak\n", headless_pcm_log);
+#endif
+  apu_set_memory_reader(apu_read_dmc_memory);
+#ifndef SMOLNES_HEADLESS_TRACE
+  if (!audio_start(main_window))
     MessageBoxA(main_window, "Audio output is unavailable; running muted.",
                 "smolnes", MB_OK | MB_ICONWARNING);
+#endif
   apu_reset();
+#ifdef SMOLNES_HEADLESS_TRACE
+  headless_audio_last_apu_cycle = apu_diagnostic_time();
+  headless_audio_cycle_remainder = 0;
+#endif
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
   frame_timing_log = fopen("frame-time.csv", "w");
   if (frame_timing_log)
@@ -887,8 +1220,11 @@ loop:
     }
   }
 
-  // Advance the APU frame sequencer at the CPU instruction's cycle rate.
-  apu_clock(cycles);
+  // DMC sample fetches stall CPU and PPU for four cycles per byte.
+  /* `cycles` stores cycles beyond the two-cycle instruction minimum.
+     The PPU path adds those two base cycles as `+6` dots below; the APU must
+     receive them as well or its clock runs about three times too slowly. */
+  cycles += apu_clock(cycles + 2);
   /* The APU frame IRQ is maskable by the CPU interrupt-disable flag. */
   if (!nmi_irq && !(P & 4) && apu_irq_pending())
     nmi_irq = 1;
@@ -993,6 +1329,7 @@ loop:
         ppustatus |= 128;
         // Render frame, skipping the top and bottom 8 pixels (they're often
         // garbage).
+#ifndef SMOLNES_HEADLESS_TRACE
         InvalidateRect(main_window, NULL, FALSE);
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
         {
@@ -1009,6 +1346,7 @@ loop:
         }
 #else
         UpdateWindow(main_window);
+#endif
 #endif
 #ifdef SMOLNES_PACING_STRESS_TEST
         {
@@ -1069,8 +1407,10 @@ loop:
           }
         }
 #endif
+#ifndef SMOLNES_HEADLESS_TRACE
         if (!pump_native_messages())
           goto shutdown;
+#endif
         if (!wait_for_next_frame())
           goto shutdown;
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
@@ -1094,41 +1434,50 @@ loop:
   goto loop;
 
 shutdown:
+#ifndef SMOLNES_HEADLESS_TRACE
   audio_stop();
-#ifdef SMOLNES_AUDIO_DIAGNOSTICS
-  {
-    FILE *audio_log = fopen("audio-stats.txt", "w");
-    if (audio_log) {
-      fprintf(audio_log, "completed_blocks=%lu\n",
-              audio_completed_blocks());
-      fprintf(audio_log, "underrun_events=%lu\n", audio_underruns());
-      fclose(audio_log);
-    }
-  }
+#else
+  if (headless_pcm_log) fclose(headless_pcm_log);
+  if (headless_mix_pcm) fclose(headless_mix_pcm);
+  if (headless_dmc_pcm) fclose(headless_dmc_pcm);
+  if (headless_apu_time_log) fclose(headless_apu_time_log);
 #endif
 #ifdef SMOLNES_FRAME_TIME_DIAGNOSTICS
   if (frame_timing_log)
     fclose(frame_timing_log);
 #endif
-  CancelWaitableTimer(frame_timer);
-  CloseHandle(frame_timer);
-  frame_timer = NULL;
+#ifndef SMOLNES_HEADLESS_TRACE
+  CancelWaitableTimer(frame_timer_16);
+  CancelWaitableTimer(frame_timer_50);
+  CloseHandle(frame_timer_16);
+  CloseHandle(frame_timer_50);
+  frame_timer_16 = frame_timer_50 = NULL;
+#endif
   return 0;
 }
 
-void mainCRTStartup(void) {
-  LPSTR command_line = GetCommandLineA();
-  if (*command_line == '"') {
-    command_line++;
-    while (*command_line && *command_line != '"')
-      command_line++;
-    if (*command_line == '"')
-      command_line++;
+#ifdef SMOLNES_HEADLESS_TRACE
+int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, LPSTR command,
+                   int show_state) {
+  char *path;
+  (void)instance; (void)previous; (void)show_state;
+  while (*command == ' ') command++;
+  if (*command == '"') {
+    path = ++command;
+    while (*command && *command != '"') command++;
   } else {
-    while (*command_line && *command_line != ' ' && *command_line != '\t')
-      command_line++;
+    path = command;
+    while (*command && *command != ' ') command++;
   }
-  while (*command_line == ' ' || *command_line == '\t')
-    command_line++;
-  ExitProcess((UINT)run_emulator(parse_rom_argument(command_line)));
+  *command = 0;
+  if (!*path) return 2;
+  return run_emulator(path);
 }
+#else
+void mainCRTStartup(void) {
+  char *path = select_rom_file();
+  if (!path)
+    ExitProcess(0);
+  ExitProcess((UINT)run_emulator(path));
+}
+#endif

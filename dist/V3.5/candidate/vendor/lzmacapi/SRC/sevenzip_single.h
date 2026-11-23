@@ -20,6 +20,27 @@ typedef enum SevenZipResult {
 } SevenZipResult;
 
 /*
+ * 裸 LZMA1 解码入口：不解析 7z 或 LZMA-Alone 容器，只解码 range-coded 数据。
+ * src 指向 5 字节 range 初始化前缀的首字节：src[0] 必须为 0，src[1..4]
+ * 是初始 Code，后面紧跟压缩数据。解码停止位置为 dst + output_size。
+ * workspace 指向至少 6,295,552 字节、按 uint16_t 对齐的可写内存；汇编每次
+ * 调用都会将最大概率表初始化为 1024。lc/lp/pb 必须是码流对应的有效属性。
+ * 此入口没有输入长度和输出容量参数，也不验证码流；调用方必须保证输入完整、
+ * 输出容量足够、src/dst/workspace 不相互覆盖，并传入正确的输出长度。
+ * 发布库返回 void；定义 LZMA_C_API_DEBUG 并链接调试库时返回实际输出末地址，
+ * 调用方必须让头文件宏与所链接的库保持一致。
+ */
+#ifdef LZMA_C_API_DEBUG
+uint8_t *__cdecl lzma_static_x86_run(
+    const uint8_t *src, uint8_t *dst, void *workspace,
+    size_t output_size, unsigned lc, unsigned lp, unsigned pb);
+#else
+void __cdecl lzma_static_x86_run(
+    const uint8_t *src, uint8_t *dst, void *workspace,
+    size_t output_size, unsigned lc, unsigned lp, unsigned pb);
+#endif
+
+/*
  * 唯一的归档入口：按固定字段顺序读取解码所需信息并调用 fast decoder，
  * 不验证归档结构或 CRC。
  * archive/archive_size 是完整 7z 文件的只读地址和字节数；output/

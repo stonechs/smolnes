@@ -1,6 +1,6 @@
 # smolnes V3.5 candidate
 
-This candidate adds 7z single-file LZMA1 ROM loading to the x86 build using the supplied static `LzmaCApi` library. The x64 build remains NES-only because the provided library is x86.
+This candidate adds 7z single-file LZMA1 ROM loading to the x86 build by compiling `src/lzmacapi/SRC/sevenzip_single_fast.c` with Clang and assembling `src/lzmacapi/SRC/lzma_static_x86.asm` with NASM. The repository-root `src/` is the source of truth; the candidate's `source/` and `vendor/lzmacapi/` directories mirror the V3.5 source snapshot and its attribution. The x64 build remains NES-only because this decoder is x86-only.
 
 ## Runtime behavior
 
@@ -12,16 +12,16 @@ This candidate adds 7z single-file LZMA1 ROM loading to the x86 build using the 
 
 ## Build and validation
 
-- `build-v3.5.cmd` builds x86 LLD, x86 Crinkler, x64 LLD, and x64 UPX outputs.
-- `test-v3.5-7z.ps1` builds debug-preflight and release-path test executables, extracts reference files with 7-Zip, and tests `D:\2026work\LzmaCApi\forTest` without opening the emulator window.
-- Latest result: 116 LZMA1 archives passed in both modes; 3 archives using other methods were skipped. Report: `results/7z-validation-results.csv`.
+- `build-v3.5.cmd` builds x86 LLD, x86 Crinkler, x64 LLD, and x64 UPX outputs from repository-root `src/`, compiling the decoder C and assembly sources directly.
+- `test-v3.5-7z.ps1` builds debug-preflight and release-path test executables from root `src/`, extracts reference files with 7-Zip, and tests `D:\2026work\LzmaCApi\forTest` without opening the emulator window.
+- Headless regression on the current direct-source build: 116 LZMA1 archives passed in both debug and release paths, 3 unsupported methods were skipped, and there were 0 failures. The test loads/decodes each archive then exits before emulation; GUI, gameplay, and audio-device testing remain unperformed. Report: `results/7z-validation-results.csv`.
 
 ## Output sizes
 
 | Output | Bytes | V3.4 baseline | Change |
 | --- | ---: | ---: | ---: |
 | x86 LLD | 16,384 | 14,848 | +1,536 |
-| x86 Crinkler | 8,516 | 7,594 | +922 |
+| x86 Crinkler | 8,431 | 7,594 | +837 |
 | x64 LLD | 17,920 | 17,920 | 0 |
 | x64 UPX | 12,288 | 12,288 | 0 |
 
@@ -29,25 +29,28 @@ This candidate adds 7z single-file LZMA1 ROM loading to the x86 build using the 
 
 | Output | Section | V3.4 virtual size → V3.5 | V3.4 raw size → V3.5 | Change |
 | --- | --- | ---: | ---: | ---: |
-| x86 LLD | `.text` | 1,244,472 → 2,293,648 | 14,336 → 14,848 | raw +512; virtual +1,049,176 |
+| x86 LLD | `.text` | 1,244,472 → 2,293,568 | 14,336 → 14,848 | raw +512; virtual +1,049,096 |
 | x86 LLD | `.lzma` | absent → 547 | 0 → 1,024 | new section |
 | x64 LLD | `.text`, `.rdata`, `.data`, `.pdata` | unchanged | unchanged | 0 |
 | x64 UPX | `UPX0`, `UPX1`, `UPX2` | unchanged | unchanged | 0 |
 
 The x86 `.text` virtual increase mainly comes from the added 1 MiB archive input buffer; it does not add that buffer to the on-disk raw section. The new `.lzma` section contributes 1,024 raw bytes after PE file alignment. Crinkler output has zero entries in the PE section table, so it is compared by total file size only.
 
-## Direct-source link experiment
+## Direct-source build size accounting
 
-`build-v3.5-lzma-source-experiment.cmd` compiles `sevenzip_single_fast.c` directly with Clang `-Oz -fno-stack-protector`, assembles `lzma_static_x86.asm` with NASM `-O9`, and links the same app objects as the static-library release. It uses the source files in `D:\2026work\LzmaCApi\SRC` and writes separate experiment outputs.
+The official x86 build now compiles the vendored C and assembly directly. The previous static-library link experiment explains the earlier `-87 B` figure: that is the direct-source map reduction versus the `.lib` link, not the increase versus V3.4.
 
-| Metric | Static `.lib` build | Direct-source build | Change |
+| Metric | V3.4 baseline | V3.5 direct source | Change |
 | --- | ---: | ---: | ---: |
-| x86 LLD EXE | 16,384 B | 16,384 B | 0 B |
-| x86 LLD `.text` code in map | `0x2E7F` B | `0x2E28` B | -87 B |
-| x86 LLD `.text` virtual size | 2,293,648 B | 2,293,568 B | -80 B |
-| x86 LLD `.text` raw / `.lzma` raw | 14,848 / 1,024 B | 14,848 / 1,024 B | 0 B |
-| x86 Crinkler EXE | 8,516 B | 8,431 B | -85 B |
+| x86 LLD `.text` virtual / raw | 1,244,472 / 14,336 B | 2,293,568 / 14,848 B | +1,049,096 / +512 B |
+| x86 LLD `.lzma` virtual / raw | absent | 547 / 1,024 B | +547 / +1,024 B |
+| x86 LLD EXE | 14,848 B | 16,384 B | +1,536 B |
+| x86 Crinkler EXE | 7,594 B | 8,431 B | +837 B |
 
-The direct build trims some wrapper and stack-cookie code, but the LLD file does not cross a PE file-alignment boundary. The Crinkler gain is modest; the 1 MiB virtual input buffer is unchanged. This experiment only compared builds and did not replace the release outputs or rerun ROM decoding.
+Map function extents show `_run_emulator` grew by 152 B (5,453 → 5,605 B); the new C decoder entry and `read_number_fast` occupy about 221 B and 87 B, respectively. The `.lzma` assembly contributes 547 B. Thus the decoder C+assembly occupies 855 B in this integrated build. The earlier 871 B number was from the standalone LzmaCApi map (245 + 79 + 547 B), with different C function boundaries/compiled sizes. These function extents and whole-program section deltas are separate accounting views and should not be added together.
+
+The map's initial `.text` contribution is 0x2C73 B in V3.4 and 0x2E28 B in this build, a net increase of 437 B. This is the linked section contribution, not a sum of only newly added functions.
+
+The PE file grows by 1,536 B because `.text` raw data increases by one 512-byte file-alignment unit and the new `.lzma` section occupies 1,024 raw bytes. The `.text` virtual increase also includes the 1 MiB archive buffer. Crinkler has no standard PE section table, so its output is compared by total file size.
 
 These are candidate builds, not a published release.
